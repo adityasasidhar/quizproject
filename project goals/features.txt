@@ -1,0 +1,55 @@
+AI-Powered Mock Exam and Quiz Generator
+Features:
+
+Mock Exam Generation:
+
+
+Wide Range of Categories: Generates mock papers for exams like GMAT, as well as various technical and non-technical quizzes including Excel, Python, etc.
+Customizable Difficulty Levels: Different difficulty levels tailored to user needs, from beginner to advanced.
+
+
+Interactive Quiz Platform:
+
+
+Real-Time Answer Submission: Allows users to answer questions in real-time with immediate feedback.
+Self-Evaluation Mode: Users can self-evaluate their answers, providing flexibility and self-paced learning.
+
+
+AI-Powered Evaluation:
+
+
+Automated Scoring: The platform evaluates submitted answers using AI, providing instant results and detailed performance analytics.
+Detailed Feedback: Offers insights into incorrect answers and areas for improvement, fostering continuous learning.
+
+
+Certification:
+
+
+Completion Certificates: Provides certificates upon successful completion of quizzes and mock exams, enhancing user credentials.
+Shareable Achievements: Users can share their certificates on social media and professional networks.
+
+
+Offline Accessibility:
+
+
+Downloadable Papers: Users can download AI-generated papers for offline practice, ensuring continuous learning without internet dependency.
+Printable Formats: Papers are available in printable formats for convenience and traditional studying methods.
+Time Management Tools:
+
+
+Built-in Timer: Features a countdown timer for each quiz and exam, helping users manage their time effectively during practice.
+Timed Practice Sessions: Simulates real exam conditions, preparing users for time-constrained environments.
+
+
+User-Friendly Interface:
+
+
+Intuitive Dashboard: Simple and easy-to-navigate dashboard for managing quizzes, tracking progress, and accessing downloadable content.
+Progress Tracking: Keeps a record of user performance over time, highlighting strengths and areas needing improvement.
+
+
+Multi-Device Compatibility:
+
+
+Cross-Platform Access: Accessible on various devices, including desktops, tablets, and smartphones, ensuring learning on-the-go.
+Sync Across Devices: Progress and performance data sync seamlessly across all devices.

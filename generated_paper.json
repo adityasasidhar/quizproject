@@ -1,0 +1,842 @@
+[
+  {
+    "question_number": 1,
+    "question": "A particle starts from the origin at t=0 with a velocity of 10.0 j m/s and moves in the x-y plane with a constant acceleration of (8.0 i + 2.0 j) m/s². At what time is the x-coordinate of the particle 16 m?",
+    "options": [
+      "1 s",
+      "2 s",
+      "3 s",
+      "4 s"
+    ],
+    "answer": "2 s"
+  },
+  {
+    "question_number": 2,
+    "question": "A block of mass 2 kg rests on a rough inclined plane making an angle of 30° with the horizontal. The coefficient of static friction between the block and the plane is 0.7. The frictional force on the block is (g = 10 m/s²):",
+    "options": [
+      "9.8 N",
+      "0.7 x 9.8 x √3 N",
+      "9.8 x √3 N",
+      "10 N"
+    ],
+    "answer": "10 N"
+  },
+  {
+    "question_number": 3,
+    "question": "A body of mass 1 kg is thrown upwards with a velocity of 20 m/s. It momentarily comes to rest after attaining a height of 18 m. How much energy is lost due to air friction? (g = 10 m/s²)",
+    "options": [
+      "20 J",
+      "30 J",
+      "40 J",
+      "10 J"
+    ],
+    "answer": "20 J"
+  },
+  {
+    "question_number": 4,
+    "question": "A solid sphere is rolling on a frictionless surface, without slipping, with a translational velocity v. It collides head-on with a stationary identical sphere. After the collision, the first sphere comes to rest. What is the velocity of the second sphere?",
+    "options": [
+      "v",
+      "2v",
+      "v/√2",
+      "7v/5"
+    ],
+    "answer": "v"
+  },
+  {
+    "question_number": 5,
+    "question": "The escape velocity from the Earth's surface is 'v_e'. The escape velocity from the surface of another planet having a radius twice that of Earth and the same mean density is:",
+    "options": [
+      "2 v_e",
+      "4 v_e",
+      "v_e / 2",
+      "v_e / 4"
+    ],
+    "answer": "2 v_e"
+  },
+  {
+    "question_number": 6,
+    "question": "A wire of length L and cross-sectional area A is made of a material of Young's modulus Y. If the wire is stretched by an amount x, the work done is:",
+    "options": [
+      "YAx²/L",
+      "YAx²/2L",
+      "YA²x/L",
+      "YA²x/2L"
+    ],
+    "answer": "YAx²/2L"
+  },
+  {
+    "question_number": 7,
+    "question": "One mole of an ideal monoatomic gas undergoes a process described by the equation PV³ = constant. The heat capacity of the gas during this process is:",
+    "options": [
+      "3R/2",
+      "5R/2",
+      "2R",
+      "R"
+    ],
+    "answer": "R"
+  },
+  {
+    "question_number": 8,
+    "question": "At what temperature will the RMS speed of oxygen molecules become just sufficient for escaping from the Earth's atmosphere? (Given: Mass of oxygen molecule = 2.76 x 10⁻²⁶ kg, Boltzmann's constant = 1.38 x 10⁻²³ J/K, Escape velocity from Earth = 11.2 km/s)",
+    "options": [
+      "2.18 x 10⁴ K",
+      "5.12 x 10⁴ K",
+      "8.36 x 10⁴ K",
+      "1.25 x 10⁴ K"
+    ],
+    "answer": "8.36 x 10⁴ K"
+  },
+  {
+    "question_number": 9,
+    "question": "A simple pendulum performs simple harmonic motion about x = 0 with an amplitude A and time period T. The speed of the pendulum at x = A/2 is:",
+    "options": [
+      "(πA√3)/T",
+      "(πA)/T",
+      "(3π²A)/T",
+      "(πA√3)/(2T)"
+    ],
+    "answer": "(πA√3)/T"
+  },
+  {
+    "question_number": 10,
+    "question": "A transverse wave is represented by y = A sin(ωt - kx). For what value of the wavelength is the wave velocity equal to the maximum particle velocity?",
+    "options": [
+      "πA/2",
+      "πA",
+      "2πA",
+      "A"
+    ],
+    "answer": "2πA"
+  },
+  {
+    "question_number": 11,
+    "question": "Two positive ions, each carrying a charge q, are separated by a distance d. If F is the force of repulsion between the ions, the number of electrons missing from each ion will be (e being the charge on an electron):",
+    "options": [
+      "√(4πε₀Fd²/e²)",
+      "√(4πε₀Fe²/d²)",
+      "4πε₀Fd²/e²",
+      "4πε₀Fe²/d"
+    ],
+    "answer": "√(4πε₀Fd²/e²)"
+  },
+  {
+    "question_number": 12,
+    "question": "A carbon resistor of (47 ± 4.7) kΩ is to be marked with rings of different colours for its identification. The colour code sequence will be:",
+    "options": [
+      "Yellow - Green - Violet - Gold",
+      "Yellow - Violet - Orange - Silver",
+      "Violet - Yellow - Orange - Silver",
+      "Green - Orange - Violet - Gold"
+    ],
+    "answer": "Yellow - Violet - Orange - Silver"
+  },
+  {
+    "question_number": 13,
+    "question": "A long straight wire of radius 'a' carries a steady current I. The current is uniformly distributed over its cross-section. The ratio of the magnetic fields B and B' at radial distances a/2 and 2a respectively, from the axis of the wire is:",
+    "options": [
+      "1",
+      "4",
+      "1/4",
+      "1/2"
+    ],
+    "answer": "1"
+  },
+  {
+    "question_number": 14,
+    "question": "The magnetic susceptibility of a material is -0.5. The material is:",
+    "options": [
+      "Paramagnetic",
+      "Diamagnetic",
+      "Ferromagnetic",
+      "Antiferromagnetic"
+    ],
+    "answer": "Diamagnetic"
+  },
+  {
+    "question_number": 15,
+    "question": "A circular coil of radius 10 cm, 500 turns and resistance 2 Ω is placed with its plane perpendicular to the horizontal component of the Earth's magnetic field. It is rotated about its vertical diameter through 180° in 0.25 s. Estimate the magnitude of the EMF induced. (Horizontal component of Earth's magnetic field at the place is 3.0 x 10⁻⁵ T)",
+    "options": [
+      "1.9 x 10⁻³ V",
+      "3.8 x 10⁻³ V",
+      "5.2 x 10⁻³ V",
+      "2.5 x 10⁻³ V"
+    ],
+    "answer": "3.8 x 10⁻³ V"
+  },
+  {
+    "question_number": 16,
+    "question": "In a series LCR circuit, the voltage across R is 100 V and R = 1 kΩ, C = 2 µF. The resonant frequency ω is 200 rad/s. At resonance, the voltage across L is:",
+    "options": [
+      "2.5 x 10⁻² V",
+      "25 V",
+      "250 V",
+      "40 V"
+    ],
+    "answer": "250 V"
+  },
+  {
+    "question_number": 17,
+    "question": "The speed of electromagnetic waves in a medium of dielectric constant 2.25 and relative permeability 4 is:",
+    "options": [
+      "1 x 10⁸ m/s",
+      "2.5 x 10⁸ m/s",
+      "3 x 10⁸ m/s",
+      "1.5 x 10⁸ m/s"
+    ],
+    "answer": "1 x 10⁸ m/s"
+  },
+  {
+    "question_number": 18,
+    "question": "A biconvex lens has a radius of curvature of magnitude 20 cm. Which one of the following options describe best the image formed of an object of height 2 cm placed 30 cm from the lens? (Refractive index of lens material = 1.5)",
+    "options": [
+      "Real, inverted, height = 1 cm",
+      "Virtual, upright, height = 0.5 cm",
+      "Real, inverted, height = 4 cm",
+      "Virtual, upright, height = 1 cm"
+    ],
+    "answer": "Real, inverted, height = 4 cm"
+  },
+  {
+    "question_number": 19,
+    "question": "In a Young's double-slit experiment, the slit separation is 0.5 mm and the screen is 1.5 m away. It is observed that the 8th bright fringe is at a distance of 12.4 mm from the central bright fringe. The wavelength of light used is:",
+    "options": [
+      "517 nm",
+      "620 nm",
+      "413 nm",
+      "589 nm"
+    ],
+    "answer": "413 nm"
+  },
+  {
+    "question_number": 20,
+    "question": "When the light of frequency 2ν₀ (where ν₀ is threshold frequency), is incident on a metal plate, the maximum velocity of electrons emitted is v₁. When the frequency of the incident radiation is increased to 5ν₀, the maximum velocity of electrons emitted from the same plate is v₂. The ratio of v₁ to v₂ is:",
+    "options": [
+      "1:2",
+      "1:4",
+      "4:1",
+      "2:1"
+    ],
+    "answer": "1:2"
+  },
+  {
+    "question_number": 21,
+    "question": "A ball is thrown vertically downwards with a velocity of 20 m/s from the top of a tower. It hits the ground after some time with a velocity of 80 m/s. The height of the tower is (in m). (g = 10 m/s²)",
+    "options": [],
+    "answer": "300"
+  },
+  {
+    "question_number": 22,
+    "question": "A pump is required to lift 600 kg of water per minute from a well 25 m deep and to eject it with a speed of 50 m/s. The power required to perform the above task is (in kW). (g = 10 m/s²)",
+    "options": [],
+    "answer": "15"
+  },
+  {
+    "question_number": 23,
+    "question": "A flywheel rotating at 420 rpm slows down at a constant rate of 2 rad/s². The time required to stop the flywheel is (in seconds). (Take π = 22/7)",
+    "options": [],
+    "answer": "22"
+  },
+  {
+    "question_number": 24,
+    "question": "A Carnot engine, having an efficiency of η = 1/10 as a heat engine, is used as a refrigerator. If the work done on the system is 10 J, the amount of energy absorbed from the reservoir at lower temperature is (in J).",
+    "options": [],
+    "answer": "90"
+  },
+  {
+    "question_number": 25,
+    "question": "In a meter bridge, the balancing length from the left end (when standard resistance of 1 Ω is in the right gap) is found to be 20 cm. The value of the unknown resistance (in Ω) is:",
+    "options": [],
+    "answer": "0.25"
+  },
+  {
+    "question_number": 26,
+    "question": "A proton enters a magnetic field of 5 T with a velocity of 4 x 10⁵ m/s at an angle of 30° with the field. The force on the proton is x * 10⁻¹⁴ N. The value of x is:",
+    "options": [],
+    "answer": "16"
+  },
+  {
+    "question_number": 27,
+    "question": "An inductor of 20 mH, a capacitor of 50 µF and a resistor of 40 Ω are connected in series across a source of emf V = 10 sin(500t). The power loss in the AC circuit is (in W).",
+    "options": [],
+    "answer": "0.8"
+  },
+  {
+    "question_number": 28,
+    "question": "The refractive index of the material of a prism is √2 and its refracting angle is 60°. The angle of minimum deviation of the prism is (in degrees).",
+    "options": [],
+    "answer": "30"
+  },
+  {
+    "question_number": 29,
+    "question": "The ratio of the wavelengths of the last line of the Balmer series and the last line of the Lyman series is:",
+    "options": [],
+    "answer": "4"
+  },
+  {
+    "question_number": 30,
+    "question": "The current gain (β) of a transistor is 100. If the base current changes by 20 µA, the change in collector current is (in mA).",
+    "options": [],
+    "answer": "2"
+  },
+  {
+    "question_number": 31,
+    "question": "The number of atoms in 0.1 mol of a triatomic gas is (Nₐ is the Avogadro constant):",
+    "options": [
+      "0.1 Nₐ",
+      "0.3 Nₐ",
+      "Nₐ",
+      "3 Nₐ"
+    ],
+    "answer": "0.3 Nₐ"
+  },
+  {
+    "question_number": 32,
+    "question": "The number of angular nodes and radial nodes in a 3p orbital are, respectively:",
+    "options": [
+      "1, 1",
+      "1, 0",
+      "2, 1",
+      "1, 2"
+    ],
+    "answer": "1, 1"
+  },
+  {
+    "question_number": 33,
+    "question": "Which of the following species has a bond order of 2.5?",
+    "options": [
+      "O₂",
+      "N₂",
+      "O₂⁺",
+      "CN⁻"
+    ],
+    "answer": "O₂⁺"
+  },
+  {
+    "question_number": 34,
+    "question": "For the reaction, 2Cl(g) → Cl₂(g), what are the signs of ΔH and ΔS?",
+    "options": [
+      "ΔH > 0, ΔS > 0",
+      "ΔH < 0, ΔS < 0",
+      "ΔH > 0, ΔS < 0",
+      "ΔH < 0, ΔS > 0"
+    ],
+    "answer": "ΔH < 0, ΔS < 0"
+  },
+  {
+    "question_number": 35,
+    "question": "The correct statement regarding the equilibrium of the reaction H₂(g) + I₂(g) ⇌ 2HI(g) is:",
+    "options": [
+      "Kp is not equal to Kc",
+      "The equilibrium constant is independent of temperature",
+      "The addition of an inert gas at constant volume will not affect the equilibrium",
+      "The addition of a catalyst will increase the equilibrium yield of HI"
+    ],
+    "answer": "The addition of an inert gas at constant volume will not affect the equilibrium"
+  },
+  {
+    "question_number": 36,
+    "question": "The solubility product of AgCl is 1.8 x 10⁻¹⁰ at 298 K. The solubility of AgCl in 0.1 M KCl solution in mol/L is:",
+    "options": [
+      "1.8 x 10⁻⁹",
+      "1.34 x 10⁻⁵",
+      "1.8 x 10⁻¹¹",
+      "1.0 x 10⁻⁵"
+    ],
+    "answer": "1.8 x 10⁻⁹"
+  },
+  {
+    "question_number": 37,
+    "question": "The oxidation number of Cr in K₂Cr₂O₇ is:",
+    "options": [
+      "+3",
+      "+5",
+      "+6",
+      "+7"
+    ],
+    "answer": "+6"
+  },
+  {
+    "question_number": 38,
+    "question": "Which of the following alkali metal chlorides forms a dihydrate salt (MCl·2H₂O)?",
+    "options": [
+      "LiCl",
+      "NaCl",
+      "KCl",
+      "CsCl"
+    ],
+    "answer": "LiCl"
+  },
+  {
+    "question_number": 39,
+    "question": "Which of the following is the most powerful oxidizing agent?",
+    "options": [
+      "F₂",
+      "Cl₂",
+      "Br₂",
+      "I₂"
+    ],
+    "answer": "F₂"
+  },
+  {
+    "question_number": 40,
+    "question": "The IUPAC name of the compound CH₃-CH(C₂H₅)-CH₂-C(CH₃)₃ is:",
+    "options": [
+      "2-Ethyl-4,4-dimethylpentane",
+      "3,5,5-Trimethylhexane",
+      "4-Ethyl-2,2-dimethylpentane",
+      "2,2,4-Trimethylhexane"
+    ],
+    "answer": "3,5,5-Trimethylhexane"
+  },
+  {
+    "question_number": 41,
+    "question": "Ozonolysis of 2-methylbut-2-ene yields:",
+    "options": [
+      "Propanal and Methanal",
+      "Propan-2-one and Ethanal",
+      "Propan-2-one and Methanal",
+      "Butan-2-one and Methanal"
+    ],
+    "answer": "Propan-2-one and Ethanal"
+  },
+  {
+    "question_number": 42,
+    "question": "A compound is formed by two elements M and N. The element N forms ccp and atoms of M occupy 1/3rd of tetrahedral voids. What is the formula of the compound?",
+    "options": [
+      "MN",
+      "M₃N₂",
+      "M₂N₃",
+      "MN₂"
+    ],
+    "answer": "M₂N₃"
+  },
+  {
+    "question_number": 43,
+    "question": "A 5.2 molal aqueous solution of methyl alcohol, CH₃OH, is supplied. What is the mole fraction of methyl alcohol in the solution?",
+    "options": [
+      "0.086",
+      "0.052",
+      "0.100",
+      "0.190"
+    ],
+    "answer": "0.086"
+  },
+  {
+    "question_number": 44,
+    "question": "Given the standard electrode potentials, K⁺/K = -2.93V, Ag⁺/Ag = 0.80V, Hg²⁺/Hg = 0.79V, Mg²⁺/Mg = -2.37V, Cr³⁺/Cr = -0.74V. The correct order of their reducing power is:",
+    "options": [
+      "Ag > Hg > Cr > Mg > K",
+      "K > Mg > Cr > Hg > Ag",
+      "K > Mg > Cr > Ag > Hg",
+      "Ag > Hg > Mg > Cr > K"
+    ],
+    "answer": "K > Mg > Cr > Hg > Ag"
+  },
+  {
+    "question_number": 45,
+    "question": "The rate of a first-order reaction is 0.04 mol L⁻¹ s⁻¹ at 10 minutes and 0.03 mol L⁻¹ s⁻¹ at 20 minutes after initiation. The half-life period of the reaction is:",
+    "options": [
+      "44.1 min",
+      "54.1 min",
+      "24.1 min",
+      "34.1 min"
+    ],
+    "answer": "24.1 min"
+  },
+  {
+    "question_number": 46,
+    "question": "Which of the following is an example of a multimolecular colloid?",
+    "options": [
+      "Sulphur sol",
+      "Starch solution",
+      "Soap solution",
+      "Protein solution"
+    ],
+    "answer": "Sulphur sol"
+  },
+  {
+    "question_number": 47,
+    "question": "The hybridization of the central metal ion in [Ni(CN)₄]²⁻ and [NiCl₄]²⁻ are respectively:",
+    "options": [
+      "dsp², sp³",
+      "sp³, dsp²",
+      "dsp², dsp²",
+      "sp³, sp³"
+    ],
+    "answer": "dsp², sp³"
+  },
+  {
+    "question_number": 48,
+    "question": "The reaction of acetaldehyde with HCN followed by hydrolysis gives a compound which shows:",
+    "options": [
+      "Geometrical isomerism",
+      "Optical isomerism",
+      "Tautomerism",
+      "Metamerism"
+    ],
+    "answer": "Optical isomerism"
+  },
+  {
+    "question_number": 49,
+    "question": "Which of the following amines is the most basic in an aqueous solution?",
+    "options": [
+      "Aniline",
+      "Methylamine",
+      "Dimethylamine",
+      "Trimethylamine"
+    ],
+    "answer": "Dimethylamine"
+  },
+  {
+    "question_number": 50,
+    "question": "Which of the following is a non-reducing sugar?",
+    "options": [
+      "Glucose",
+      "Sucrose",
+      "Maltose",
+      "Lactose"
+    ],
+    "answer": "Sucrose"
+  },
+  {
+    "question_number": 51,
+    "question": "A gaseous hydrocarbon gives upon combustion 0.72 g of water and 3.08 g of CO₂. The empirical formula of the hydrocarbon is CₓHᵧ. The value of x + y is:",
+    "options": [],
+    "answer": "15"
+  },
+  {
+    "question_number": 52,
+    "question": "For the reaction N₂(g) + 3H₂(g) ⇌ 2NH₃(g) at 400 K, Kp = 41 atm⁻². The value of Kp for the reaction 2NH₃(g) ⇌ N₂(g) + 3H₂(g) will be approximately (in atm² x 10⁻³).",
+    "options": [],
+    "answer": "24"
+  },
+  {
+    "question_number": 53,
+    "question": "The limiting molar conductivities (Λ°m) for NaCl, HCl, and CH₃COONa are 126.4, 425.9, and 91.0 S cm² mol⁻¹ respectively. The limiting molar conductivity for CH₃COOH is (in S cm² mol⁻¹).",
+    "options": [],
+    "answer": "390.5"
+  },
+  {
+    "question_number": 54,
+    "question": "The decomposition of a substance follows first-order kinetics. If 75% of the substance decomposes in 120 minutes, the time taken for 93.75% decomposition is (in minutes).",
+    "options": [],
+    "answer": "240"
+  },
+  {
+    "question_number": 55,
+    "question": "In the disproportionation reaction: P₄ + 3NaOH + 3H₂O → PH₃ + 3NaH₂PO₂, the change in oxidation state for the phosphorus atom that gets oxidized is:",
+    "options": [],
+    "answer": "1"
+  },
+  {
+    "question_number": 56,
+    "question": "The spin-only magnetic moment of [Fe(H₂O)₆]³⁺ ion is (in Bohr Magnetons, rounded to the nearest integer).",
+    "options": [],
+    "answer": "6"
+  },
+  {
+    "question_number": 57,
+    "question": "How many of the following compounds will give a positive iodoform test? Acetone, Propanal, Butan-2-one, Pentan-3-one, Acetaldehyde, Ethanol, Propan-2-ol.",
+    "options": [],
+    "answer": "5"
+  },
+  {
+    "question_number": 58,
+    "question": "The number of isomeric primary amines possible for the molecular formula C₄H₁₁N is:",
+    "options": [],
+    "answer": "4"
+  },
+  {
+    "question_number": 59,
+    "question": "A solution containing 10 g per dm³ of urea (molar mass = 60 g mol⁻¹) is isotonic with a 5% (w/v) solution of a non-volatile solute. The molar mass of this non-volatile solute is (in g mol⁻¹).",
+    "options": [],
+    "answer": "300"
+  },
+  {
+    "question_number": 60,
+    "question": "The enthalpy of combustion of methane, graphite and dihydrogen at 298 K are -890.3 kJ mol⁻¹, -393.5 kJ mol⁻¹ and -285.8 kJ mol⁻¹ respectively. The magnitude of enthalpy of formation of methane will be (in kJ mol⁻¹).",
+    "options": [],
+    "answer": "74.8"
+  },
+  {
+    "question_number": 61,
+    "question": "Let A = {x, y, z} and B = {1, 2, 3}. The number of bijective functions from A to B is:",
+    "options": [
+      "3",
+      "6",
+      "9",
+      "1"
+    ],
+    "answer": "6"
+  },
+  {
+    "question_number": 62,
+    "question": "If z is a complex number such that |z - 4| < |z - 2|, its solution is given by:",
+    "options": [
+      "Re(z) > 0",
+      "Re(z) < 3",
+      "Re(z) > 3",
+      "Re(z) > 2"
+    ],
+    "answer": "Re(z) > 3"
+  },
+  {
+    "question_number": 63,
+    "question": "If A is a 3x3 non-singular matrix such that AAᵀ = AᵀA and B = A⁻¹Aᵀ, then BBᵀ equals:",
+    "options": [
+      "I",
+      "B⁻¹",
+      "A⁻¹",
+      "A"
+    ],
+    "answer": "I"
+  },
+  {
+    "question_number": 64,
+    "question": "The number of ways in which 6 men and 5 women can dine at a round table if no two women are to sit together is given by:",
+    "options": [
+      "6! x 5!",
+      "30",
+      "5! x ⁴P₅",
+      "5! x ⁶P₅"
+    ],
+    "answer": "5! x ⁶P₅"
+  },
+  {
+    "question_number": 65,
+    "question": "The coefficient of x⁷ in the expansion of (1 - x - x² + x³)⁶ is:",
+    "options": [
+      "144",
+      "-132",
+      "-144",
+      "132"
+    ],
+    "answer": "-144"
+  },
+  {
+    "question_number": 66,
+    "question": "If the sum of n terms of an A.P. is given by Sₙ = 3n² + 5n, then its 27th term is:",
+    "options": [
+      "164",
+      "167",
+      "161",
+      "170"
+    ],
+    "answer": "164"
+  },
+  {
+    "question_number": 67,
+    "question": "The reflection of the point (4, -13) about the line 5x + y + 6 = 0 is:",
+    "options": [
+      "(1, -14)",
+      "(-1, -14)",
+      "(1, 14)",
+      "(-1, 14)"
+    ],
+    "answer": "(-1, -14)"
+  },
+  {
+    "question_number": 68,
+    "question": "The equation of the circle passing through the points (1, 0) and (0, 1) and having its center on the line x + y = 1 is:",
+    "options": [
+      "x² + y² - x - y = 0",
+      "x² + y² + x + y = 0",
+      "x² + y² - 2x - 2y + 1 = 0",
+      "x² + y² + x - y = 0"
+    ],
+    "answer": "x² + y² - x - y = 0"
+  },
+  {
+    "question_number": 69,
+    "question": "The equation of the directrix of the parabola y² + 4y + 4x + 2 = 0 is:",
+    "options": [
+      "x = -1/2",
+      "x = 3/2",
+      "x = 1",
+      "x = -1"
+    ],
+    "answer": "x = 3/2"
+  },
+  {
+    "question_number": 70,
+    "question": "The value of the limit: lim (x→0) [ (√(1+x) - 1) / x ] is:",
+    "options": [
+      "1",
+      "0",
+      "1/2",
+      "2"
+    ],
+    "answer": "1/2"
+  },
+  {
+    "question_number": 71,
+    "question": "If y = log(log(log x³)), then dy/dx is:",
+    "options": [
+      "1 / (x log x log(log x³))",
+      "3 / (x log x³ log(log x³))",
+      "1 / (x log(log x))",
+      "3 / (x log x)"
+    ],
+    "answer": "3 / (x log x³ log(log x³))"
+  },
+  {
+    "question_number": 72,
+    "question": "The interval in which the function f(x) = 2x³ - 9x² + 12x + 15 is decreasing is:",
+    "options": [
+      "(-∞, 1)",
+      "(2, ∞)",
+      "(1, 2)",
+      "(-∞, 1) U (2, ∞)"
+    ],
+    "answer": "(1, 2)"
+  },
+  {
+    "question_number": 73,
+    "question": "The integral of ∫ (x eˣ) / (1+x)² dx is equal to:",
+    "options": [
+      "eˣ / (1+x) + C",
+      "eˣ (1+x) + C",
+      "-eˣ / (1+x) + C",
+      "eˣ / (1+x)² + C"
+    ],
+    "answer": "eˣ / (1+x) + C"
+  },
+  {
+    "question_number": 74,
+    "question": "The value of the definite integral ∫₀¹ x(1-x)ⁿ dx is:",
+    "options": [
+      "1 / (n+1)",
+      "1 / (n+2)",
+      "1 / ((n+1)(n+2))",
+      "n / (n+1)"
+    ],
+    "answer": "1 / ((n+1)(n+2))"
+  },
+  {
+    "question_number": 75,
+    "question": "The area of the region bounded by the parabola y = x² and the line y = 4 is (in square units):",
+    "options": [
+      "16/3",
+      "32/3",
+      "8",
+      "64/3"
+    ],
+    "answer": "32/3"
+  },
+  {
+    "question_number": 76,
+    "question": "The general solution of the differential equation dy/dx = (x+y)² is:",
+    "options": [
+      "tan⁻¹(x+y) = x + C",
+      "cot⁻¹(x+y) = x + C",
+      "tan⁻¹(x+y) = y + C",
+      "cot⁻¹(x+y) = y + C"
+    ],
+    "answer": "tan⁻¹(x+y) = x + C"
+  },
+  {
+    "question_number": 77,
+    "question": "If a, b, c are three non-coplanar vectors, then the value of (a+b+c) · [(a+b) x (a+c)] is:",
+    "options": [
+      "0",
+      "[a b c]",
+      "2[a b c]",
+      "-[a b c]"
+    ],
+    "answer": "-[a b c]"
+  },
+  {
+    "question_number": 78,
+    "question": "The distance of the point (1, -5, 9) from the plane x - y + z = 5 measured parallel to the line x = y = z is:",
+    "options": [
+      "10√3",
+      "10/√3",
+      "5√3",
+      "20/3"
+    ],
+    "answer": "10√3"
+  },
+  {
+    "question_number": 79,
+    "question": "A fair die is thrown three times. The probability of getting a sum of 15 is:",
+    "options": [
+      "5/216",
+      "1/18",
+      "5/108",
+      "1/12"
+    ],
+    "answer": "5/108"
+  },
+  {
+    "question_number": 80,
+    "question": "The value of sin(π/18) sin(5π/18) sin(7π/18) is:",
+    "options": [
+      "1/2",
+      "1/4",
+      "1/8",
+      "1/16"
+    ],
+    "answer": "1/8"
+  },
+  {
+    "question_number": 81,
+    "question": "If the system of linear equations x + y + z = 5, x + 2y + 2z = 6, x + 3y + λz = μ has infinitely many solutions, then the value of λ + μ is:",
+    "options": [],
+    "answer": "10"
+  },
+  {
+    "question_number": 82,
+    "question": "Let a₁, a₂, a₃, ... be in harmonic progression with a₁ = 5 and a₂₀ = 25. The least positive integer n for which aₙ < 0 is:",
+    "options": [],
+    "answer": "25"
+  },
+  {
+    "question_number": 83,
+    "question": "If the 2nd, 3rd, and 4th terms in the binomial expansion of (x+a)ⁿ are 240, 720, and 1080 respectively, then the value of n is:",
+    "options": [],
+    "answer": "5"
+  },
+  {
+    "question_number": 84,
+    "question": "If lim (x→∞) [(x²+x+1)/(x+1) - ax - b] = 4, then the value of a + b is:",
+    "options": [],
+    "answer": "-3"
+  },
+  {
+    "question_number": 85,
+    "question": "The minimum value of the function f(x) = 3x⁴ - 8x³ - 6x² + 24x on the interval [0, 3] is:",
+    "options": [],
+    "answer": "8"
+  },
+  {
+    "question_number": 86,
+    "question": "The value of the integral ∫₀^(π/2) (√cotx)/(√cotx + √tanx) dx is kπ. The value of k is:",
+    "options": [],
+    "answer": "0.25"
+  },
+  {
+    "question_number": 87,
+    "question": "Let a = 2i+j-2k and b = i+j. If c is a vector such that a.c = |c|, |c-a| = 2√2 and the angle between (a x b) and c is 30°, then the value of |(a x b) x c| is:",
+    "options": [],
+    "answer": "1.5"
+  },
+  {
+    "question_number": 88,
+    "question": "Let vector a = i+j+k, b = i-j+k and c = i-j-k. Let v be a vector in the plane of a and b, whose projection on c is 1/√3. If v also has the minimum possible length, then v.v is:",
+    "options": [],
+    "answer": "1"
+  },
+  {
+    "question_number": 89,
+    "question": "The distance of the point (1, 2, 3) from the line (x-6)/3 = (y-7)/2 = (z-7)/-2 is:",
+    "options": [],
+    "answer": "7"
+  },
+  {
+    "question_number": 90,
+    "question": "Two integers are selected at random from the set {1, 2, ..., 11}. Given that the sum of selected numbers is even, the conditional probability that both the numbers are even is:",
+    "options": [],
+    "answer": "0.4"
+  }
+]
