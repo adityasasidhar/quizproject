@@ -74,4 +74,4 @@ def extract_and_convert(filepath):
     return question_pdf_path, answer_pdf_path
 
 
-extract_and_convert("../generated_paper.json")
+extract_and_convert("../GENERATED_PAPERS/generated_paper.json")
