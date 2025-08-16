@@ -3,10 +3,8 @@ from typing import List
 from google import genai
 from pydantic import BaseModel
 
-# Model name for Gemini API
 model = "gemini-2.5-pro"
 
-# Context string for JEE Mains paper generation
 jee_mains_context = """
 The JEE Mains paper typically consists of three sections: Physics, Chemistry, and Mathematics. Each section contains multiple-choice questions (MCQs) and numerical value-based questions. The exam is conducted in a computer-based format.
 I want you to generate a paper for JEE Mains with the following specifications:\n
@@ -58,7 +56,7 @@ class PaperFormatForSubjective(BaseModel):
     answer: str
 
 # Read API key from file
-with open("../apikey.txt", 'r') as f:
+with open("apikey.txt", 'r') as f:
     api_key = f.read().strip()
 
 
@@ -66,6 +64,7 @@ with open("../apikey.txt", 'r') as f:
 client = genai.Client(api_key=api_key)
 
 def generate_paper(name_of_the_exam: str, difficulty_level: str, format_of_the_exam: str):
+    print("Generating paper for:", name_of_the_exam, "with difficulty level:", difficulty_level, "and format:", format_of_the_exam)
     """
     Generates a paper based on the provided parameters.
 

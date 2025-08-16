@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Results{% endblock %}
+
+{% block head %}
+<style>
+    .result-card {
+        margin-bottom: 1.5rem;
+    }
+    .question-number {
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+    .correct-answer {
+        color: #198754;
+        font-weight: bold;
+    }
+    .incorrect-answer {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .score-card {
+        font-size: 1.2rem;
+    }
+    .score-percentage {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .score-details {
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Exam Results</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        <div class="score-percentage">{{ percentage|round(1) }}%</div>
+                        <div class="score-details">
+                            <span class="badge bg-success">{{ score }} correct</span> out of 
+                            <span class="badge bg-secondary">{{ total }} questions</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="score-card">
+                            {% if percentage >= 90 %}
+                                <div class="alert alert-success">
+                                    <strong>Excellent!</strong> You've demonstrated exceptional understanding of the material.
+                                </div>
+                            {% elif percentage >= 75 %}
+                                <div class="alert alert-success">
+                                    <strong>Great job!</strong> You have a strong grasp of the material.
+                                </div>
+                            {% elif percentage >= 60 %}
+                                <div class="alert alert-warning">
+                                    <strong>Good effort!</strong> You understand most of the material, but there's room for improvement.
+                                </div>
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    <strong>Keep studying!</strong> You might need to review the material more thoroughly.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="mb-3">Detailed Results</h3>
+        
+        {% for result in results %}
+        <div class="card result-card">
+            <div class="card-header">
+                <span class="question-number">Question {{ result.question_number }}:</span>
+                {{ result.question }}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Your Answer:</strong> 
+                            <span class="{{ 'correct-answer' if result.is_correct else 'incorrect-answer' }}">
+                                {{ result.user_answer if result.user_answer else 'No answer provided' }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Correct Answer:</strong> 
+                            <span class="correct-answer">{{ result.correct_answer }}</span>
+                        </p>
+                    </div>
+                </div>
+                
+                {% if not result.is_correct %}
+                <div class="alert alert-info mt-2">
+                    <strong>Explanation:</strong> The correct answer is {{ result.correct_answer }}.
+                    {% if is_uploaded is defined and is_uploaded %}
+                    {% else %}
+                    Try to understand why this is the correct answer for future reference.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="d-grid gap-2 mt-4 mb-5">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Return to Home</a>
+            {% if is_uploaded is defined and is_uploaded %}
+            <a href="{{ url_for('upload_answers') }}" class="btn btn-secondary">Upload Another Answer Sheet</a>
+            {% else %}
+            <a href="{{ url_for('exam_setup') }}" class="btn btn-secondary">Take Another Exam</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

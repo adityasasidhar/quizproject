@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Generator - Home{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">Welcome to Exam Generator</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead text-center">Choose an exam mode to get started:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h3 class="card-title">Online Exam</h3>
+                                <p class="card-text">Take an exam online and get instant results.</p>
+                                <ul class="text-start">
+                                    <li>Questions displayed on screen</li>
+                                    <li>Submit answers electronically</li>
+                                    <li>Get instant scoring and feedback</li>
+                                </ul>
+                                <a href="{{ url_for('exam_setup', mode='online') }}" class="btn btn-primary mt-3">Start Online Exam</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h3 class="card-title">Offline Exam</h3>
+                                <p class="card-text">Download exam paper and upload answers later.</p>
+                                <ul class="text-start">
+                                    <li>Download exam questions</li>
+                                    <li>Take the exam on paper</li>
+                                    <li>Upload photo of answers for scoring</li>
+                                </ul>
+                                <a href="{{ url_for('exam_setup', mode='offline') }}" class="btn btn-success mt-3">Start Offline Exam</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
