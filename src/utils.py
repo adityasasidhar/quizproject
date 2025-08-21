@@ -67,11 +67,9 @@ def check_online_paper(generated_paper_filepath: str, submitted_answer_sheet_fil
     with open(submitted_answer_sheet_filepath, 'r') as f:
         submitted_answers = json.load(f)
 
-    # Load generated paper
     with open(generated_paper_filepath, 'r') as f:
         generated_paper = json.load(f)
 
-    # Initialize score and results
     score = 0
     results = []
 
@@ -80,7 +78,6 @@ def check_online_paper(generated_paper_filepath: str, submitted_answer_sheet_fil
         q_num = question.get('question_number')
         correct_answer = question.get('answer')
         submitted_answer = submitted_answers.get(str(q_num)) or submitted_answers.get(q_num)
-        # Check if answer matches
         is_correct = (str(submitted_answer).strip().lower() == str(correct_answer).strip().lower())
         results.append({
             'question_number': q_num,

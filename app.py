@@ -30,17 +30,13 @@ def index():
 
 @app.route('/exam_setup', methods=['GET', 'POST'])
 def exam_setup():
-    """Form to select exam type, difficulty, and format"""
     if request.method == 'POST':
         exam_mode = request.form.get('exam_mode')
         exam_name = request.form.get('exam_name')
         difficulty = request.form.get('difficulty')
         exam_format = request.form.get('exam_format')
-        
-        # Generate the paper
+
         json_path = generate_paper(exam_name, difficulty, exam_format)
-        
-        # Store the path in session for later use
         session['json_path'] = json_path
         session['exam_name'] = exam_name
         session['difficulty'] = difficulty
@@ -204,8 +200,7 @@ def upload_answers():
                     model="gemini-2.5-flash",
                     contents=f"{prompt}",
                 )
-                
-                # Parse the response
+
                 try:
                     # Extract JSON from the response
                     response_text = response.text
