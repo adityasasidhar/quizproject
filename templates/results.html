@@ -29,6 +29,10 @@
     .score-details {
         font-size: 1.2rem;
     }
+    .solution {
+        color: #198754;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -104,7 +108,10 @@
                     <strong>Explanation:</strong> The correct answer is {{ result.correct_answer }}.
                     {% if is_uploaded is defined and is_uploaded %}
                     {% else %}
-                    Try to understand why this is the correct answer for future reference.
+                    <strong>Solution: </strong>
+                    <span class = "solution">
+                        {{ result.solution }}
+                    </span>
                     {% endif %}
                 </div>
                 {% endif %}

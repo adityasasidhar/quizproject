@@ -10,7 +10,6 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # For session management
 
-# Read API key from file
 with open("apikey.txt", 'r') as f:
     api_key = f.read().strip()
 
@@ -98,7 +97,8 @@ def submit_exam():
             'question': q['question'],
             'user_answer': user_answer,
             'correct_answer': correct_answer,
-            'is_correct': is_correct
+            'is_correct': is_correct,
+            'solution': q.get('solution', '')
         })
     
     percentage = (score / total) * 100 if total > 0 else 0
@@ -197,7 +197,7 @@ def upload_answers():
                 
                 # Call Gemini to analyze the image
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-2.5-flash-lite",
                     contents=f"{prompt}",
                 )
 
@@ -231,7 +231,6 @@ def upload_answers():
                 return render_template('upload_answers.html', error=f"Error processing image: {str(e)}")
             
             finally:
-                # Clean up temporary file
                 if os.path.exists(filepath):
                     os.remove(filepath)
                 if os.path.exists(temp_dir):

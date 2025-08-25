@@ -146,6 +146,21 @@ def extract_and_convert(filepath):
             subject = item.get('subject', 'General')
             subjects.setdefault(subject, []).append(item)
 
+        # Determine exam subdirectory from JSON path
+        exam_subdir = "MISC"
+        parts = os.path.normpath(filepath).split(os.sep)
+        for candidate in ("MAINS", "ADVANCED", "NEET"):
+            if candidate in parts:
+                exam_subdir = candidate
+                break
+
+        # Ensure papers output directory exists
+        papers_dir = os.path.join("PAPERS", exam_subdir)
+        os.makedirs(papers_dir, exist_ok=True)
+
+        # Base name for PDFs derived from JSON filename (already unique due to timestamp)
+        base_name = os.path.splitext(os.path.basename(filepath))[0]
+
         # Generate Question Paper PDF
         question_pdf = FPDF()
         question_pdf.add_page()
@@ -169,7 +184,7 @@ def extract_and_convert(filepath):
                 question_pdf.ln(4)
             question_pdf.ln(6)
 
-        question_pdf_path = filepath.replace(".json", "_questions.pdf")
+        question_pdf_path = os.path.join(papers_dir, f"{base_name}_questions.pdf")
         question_pdf.output(question_pdf_path)
 
         # Generate Answer Sheet PDF
@@ -190,7 +205,7 @@ def extract_and_convert(filepath):
                 answer_pdf.cell(0, 10, f"Q{item['question_number']}: {answer_text}", ln=True)
             answer_pdf.ln(6)
 
-        answer_pdf_path = filepath.replace(".json", "_answers.pdf")
+        answer_pdf_path = os.path.join(papers_dir, f"{base_name}_answers.pdf")
         answer_pdf.output(answer_pdf_path)
 
         return question_pdf_path, answer_pdf_path
