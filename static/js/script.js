@@ -3,6 +3,16 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Theme toggle switch
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    });
+    // Load theme from localStorage
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+    }
     // Enable Bootstrap tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {

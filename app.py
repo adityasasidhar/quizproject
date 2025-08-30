@@ -1,7 +1,7 @@
 import os
 import json
 import base64
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, session, flash
 from src.generate_paper import generate_paper
 from google import genai
 import tempfile
@@ -241,6 +241,47 @@ def upload_answers():
                                   error="File type not allowed. Please upload a JPG, JPEG, or PNG image.")
     
     return render_template('upload_answers.html')
+
+# Simple in-memory user store for demonstration
+users = {}
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = users.get(username)
+        if user and user['password'] == password:
+            session['username'] = username
+            flash('Login successful!', 'success')
+            return redirect(url_for('index'))
+        else:
+            error = 'Invalid username or password.'
+    return render_template('login.html', error=error)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+        if not username or not password or not email:
+            error = 'All fields are required.'
+        elif username in users:
+            error = 'Username already exists.'
+        else:
+            users[username] = {'password': password, 'email': email}
+            flash('Signup successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+    return render_template('signup.html', error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('Logged out successfully.', 'info')
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
