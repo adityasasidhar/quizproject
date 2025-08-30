@@ -35,14 +35,10 @@ def extract_and_convert(filepath):
             exam_subdir = candidate
             break
 
-    # Ensure papers output directory exists
     papers_dir = os.path.join("PAPERS", exam_subdir)
     os.makedirs(papers_dir, exist_ok=True)
 
-    # Base name for PDFs derived from JSON filename (already unique due to timestamp)
     base_name = os.path.splitext(os.path.basename(filepath))[0]
-
-    # Generate Question Paper PDF
     question_pdf = FPDF()
     question_pdf.add_page()
     question_pdf.set_font("Arial", 'B', 16)
