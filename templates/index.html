@@ -3,45 +3,50 @@
 {% block title %}Exam Generator - Home{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h2 class="text-center mb-0">Welcome to Exam Generator</h2>
+<div class="container">
+    <div class="text-center mb-5">
+        <h2>Welcome to the Exam Generator</h2>
+        <p class="lead">Select an exam category to begin</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-atom fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">JEE Mains</h5>
+                    <p class="card-text">Engineering entrance exam with MCQs and numerical questions.</p>
+                    <a href="{{ url_for('exam_selection', exam_type='JEE_MAINS') }}" class="btn btn-primary">Select</a>
+                </div>
             </div>
-            <div class="card-body">
-                <p class="lead text-center">Choose an exam mode to get started:</p>
-                
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h3 class="card-title">Online Exam</h3>
-                                <p class="card-text">Take an exam online and get instant results.</p>
-                                <ul class="text-start">
-                                    <li>Questions displayed on screen</li>
-                                    <li>Submit answers electronically</li>
-                                    <li>Get instant scoring and feedback</li>
-                                </ul>
-                                <a href="{{ url_for('exam_setup', mode='online') }}" class="btn btn-primary mt-3">Start Online Exam</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <h3 class="card-title">Offline Exam</h3>
-                                <p class="card-text">Download exam paper and upload answers later.</p>
-                                <ul class="text-start">
-                                    <li>Download exam questions</li>
-                                    <li>Take the exam on paper</li>
-                                    <li>Upload photo of answers for scoring</li>
-                                </ul>
-                                <a href="{{ url_for('exam_setup', mode='offline') }}" class="btn btn-success mt-3">Start Offline Exam</a>
-                            </div>
-                        </div>
-                    </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-rocket fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">JEE Advanced</h5>
+                    <p class="card-text">Advanced engineering entrance exam for IITs.</p>
+                    <a href="{{ url_for('exam_selection', exam_type='JEE_ADVANCED') }}" class="btn btn-success">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">NEET UG</h5>
+                    <p class="card-text">Medical entrance exam for undergraduate courses.</p>
+                    <a href="{{ url_for('exam_selection', exam_type='NEET_UG') }}" class="btn btn-danger">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="fas fa-school fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">School Exams</h5>
+                    <p class="card-text">Quizzes and tests for school students from grades 9-12.</p>
+                    <a href="{{ url_for('exam_selection', exam_type='SCHOOL') }}" class="btn btn-info">Select</a>
                 </div>
             </div>
         </div>

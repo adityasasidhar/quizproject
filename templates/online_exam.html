@@ -5,122 +5,245 @@
 {% block head %}
 <style>
     .question-card {
+        display: none;
         margin-bottom: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        min-height: 450px; /* Increased height */
     }
-    .question-number {
-        font-weight: bold;
-        margin-right: 0.5rem;
+    .question-card.active {
+        display: block;
+    }
+    .question-card .card-body {
+        font-size: 1.15rem; /* Increased font size */
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #007bff;
+        font-size: 1.3rem; /* Increased font size */
     }
     .timer {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         font-weight: bold;
+        color: #dc3545;
     }
-    .options-list {
-        list-style-type: none;
-        padding-left: 0;
+    .question-palette {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
     }
-    .options-list li {
-        margin-bottom: 0.5rem;
+    .palette-item {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .palette-item.unvisited {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    .palette-item.visited {
+        background-color: #e9ecef;
+        color: #333;
+    }
+    .palette-item.current {
+        background-color: #007bff;
+        color: white;
+        transform: scale(1.1);
+    }
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: flex-start; /* Aligns buttons to the left */
+        gap: 1rem;
+        margin-top: 1.5rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="educational-header text-center">
+    <h1>{{ session.get('exam_name', 'Online Exam') }}</h1>
+    <p class="lead">Welcome, {{ session.get('username', 'Student') }}!</p>
+</div>
+
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-10">
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h2 class="mb-0">Online Exam</h2>
-                <div class="timer" id="exam-timer">Time: 00:00:00</div>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Exam Questions</h2>
+                <div class="timer" id="exam-timer">03:00:00</div>
             </div>
             <div class="card-body">
-                <div class="alert alert-info">
-                    <p><strong>Instructions:</strong></p>
-                    <ul>
-                        <li>Answer all questions to the best of your ability.</li>
-                        <li>For multiple choice questions, select the correct option.</li>
-                        <li>For numerical questions, enter your answer in the provided field.</li>
-                        <li>Click "Submit Exam" when you're finished.</li>
-                    </ul>
+                <div id="progress-indicator" class="text-center font-weight-bold mb-3"></div>
+                <form method="POST" action="{{ url_for('submit_exam') }}" id="exam-form">
+                    {% for question in questions %}
+                    <div class="card question-card {% if loop.first %}active{% endif %}" id="question-{{ loop.index0 }}">
+                        <div class="card-header">
+                            <span class="question-number">Question {{ question.question_number }}:</span>
+                            {{ question.question | safe }}
+                        </div>
+                        <div class="card-body">
+                            {% if question.options and question.options|length > 0 %}
+                            <ul class="options-list list-unstyled">
+                                {% for option in question.options %}
+                                <li>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="{{ question.question_number }}" id="q{{ question.question_number }}_option{{ loop.index }}" value="{{ option }}">
+                                        <label class="form-check-label" for="q{{ question.question_number }}_option{{ loop.index }}">
+                                            {{ option | safe }}
+                                        </label>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <div class="mb-3">
+                                <label for="q{{ question.question_number }}_answer" class="form-label">Your Answer:</label>
+                                <input type="text" class="form-control" id="q{{ question.question_number }}_answer" name="{{ question.question_number }}" placeholder="Enter your answer">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="navigation-buttons">
+                        <button type="button" id="prev-btn" class="btn btn-secondary rounded-pill">Prev</button>
+                        <button type="button" id="next-btn" class="btn btn-primary rounded-pill">Next</button>
+                    </div>
+
+                    <div class="action-buttons mt-4">
+                        <button type="submit" id="submit-btn" class="btn btn-success btn-lg rounded-pill">Submit</button>
+                        <a href="{{ url_for('index') }}" class="btn btn-danger btn-sm rounded-pill">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-header">Question Palette</div>
+            <div class="card-body">
+                <div id="question-palette" class="question-palette"></div>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark">Unvisited</span>
+                    <span class="badge bg-secondary text-white">Visited</span>
+                    <span class="badge bg-primary">Current</span>
                 </div>
             </div>
         </div>
-
-        <form method="POST" action="{{ url_for('submit_exam') }}" id="exam-form">
-            {% for question in questions %}
-            <div class="card question-card">
-                <div class="card-header">
-                    <span class="question-number">Question {{ question.question_number }}:</span>
-                    {{ question.question }}
-                </div>
-                <div class="card-body">
-                    {% if question.options and question.options|length > 0 %}
-                    <!-- Multiple choice question -->
-                    <ul class="options-list">
-                        {% for option in question.options %}
-                        <li>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="{{ question.question_number }}" 
-                                       id="q{{ question.question_number }}_option{{ loop.index }}" value="{{ option }}">
-                                <label class="form-check-label" for="q{{ question.question_number }}_option{{ loop.index }}">
-                                    {{ option }}
-                                </label>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <!-- Numerical/subjective question -->
-                    <div class="mb-3">
-                        <label for="q{{ question.question_number }}_answer" class="form-label">Your Answer:</label>
-                        <input type="text" class="form-control" id="q{{ question.question_number }}_answer" 
-                               name="{{ question.question_number }}" placeholder="Enter your answer">
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-
-            <div class="d-grid gap-2 mt-4 mb-5">
-                <button type="submit" class="btn btn-primary btn-lg">Submit Exam</button>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel Exam</a>
-            </div>
-        </form>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Timer functionality
     document.addEventListener('DOMContentLoaded', function() {
-        let seconds = 0;
-        let minutes = 0;
-        let hours = 0;
+        const questions = document.querySelectorAll('.question-card');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressIndicator = document.getElementById('progress-indicator');
+        const paletteContainer = document.getElementById('question-palette');
         
-        const timerElement = document.getElementById('exam-timer');
-        
-        function updateTimer() {
-            seconds++;
-            if (seconds >= 60) {
-                seconds = 0;
-                minutes++;
-                if (minutes >= 60) {
-                    minutes = 0;
-                    hours++;
+        let currentQuestion = 0;
+        const visitedStatus = Array(questions.length).fill(false);
+
+        function createPalette() {
+            questions.forEach((_, i) => {
+                const item = document.createElement('div');
+                item.classList.add('palette-item', 'unvisited');
+                item.textContent = i + 1;
+                item.dataset.index = i;
+                item.addEventListener('click', () => {
+                    showQuestion(parseInt(item.dataset.index));
+                });
+                paletteContainer.appendChild(item);
+            });
+        }
+
+        function updatePalette() {
+            const items = paletteContainer.children;
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('current', 'visited', 'unvisited');
+                if (i === currentQuestion) {
+                    items[i].classList.add('current');
+                } else if (visitedStatus[i]) {
+                    items[i].classList.add('visited');
+                } else {
+                    items[i].classList.add('unvisited');
                 }
             }
-            
-            const formattedTime = 
-                (hours < 10 ? '0' + hours : hours) + ':' +
-                (minutes < 10 ? '0' + minutes : minutes) + ':' +
-                (seconds < 10 ? '0' + seconds : seconds);
-                
-            timerElement.textContent = 'Time: ' + formattedTime;
         }
-        
-        // Update timer every second
-        setInterval(updateTimer, 1000);
+
+        function showQuestion(index) {
+            visitedStatus[currentQuestion] = true;
+            currentQuestion = index;
+            
+            questions.forEach((q, i) => q.classList.toggle('active', i === index));
+            progressIndicator.textContent = `Question ${index + 1} of ${questions.length}`;
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === questions.length - 1;
+            
+            updatePalette();
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        });
+
+        createPalette();
+        showQuestion(0);
+
+        // Timer functionality
+        const examName = "{{ session.get('exam_name', '') }}";
+        let duration = 0; // in seconds
+
+        if (examName === 'JEE MAINS' || examName === 'NEET' || examName === 'ADVANCED') {
+            duration = 3 * 60 * 60; // 3 hours
+        }
+
+        const timerElement = document.getElementById('exam-timer');
+        const examForm = document.getElementById('exam-form');
+
+        if (duration > 0) {
+            let remainingTime = duration;
+            const timerInterval = setInterval(() => {
+                const hours = Math.floor(remainingTime / 3600);
+                const minutes = Math.floor((remainingTime % 3600) / 60);
+                const seconds = remainingTime % 60;
+
+                timerElement.textContent = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time is up! Submitting your exam.');
+                    examForm.submit();
+                }
+                remainingTime--;
+            }, 1000);
+        } else {
+            timerElement.style.display = 'none';
+        }
     });
 </script>
 {% endblock %}
