@@ -32,15 +32,45 @@ def exam_setup():
     if request.method == 'POST':
         exam_mode = request.form.get('exam_mode')
         exam_name = request.form.get('exam_name')
-        difficulty = request.form.get('difficulty')
-        exam_format = request.form.get('exam_format')
+        json_path = None
 
-        json_path = generate_paper(exam_name, difficulty, exam_format)
+        if exam_name in ['SCHOOL_QUIZ', 'SCHOOL_TEST']:
+            subject = request.form.get('subject')
+            grade = request.form.get('grade')
+            board = request.form.get('board')
+            chapters_str = request.form.get('chapters')
+            chapters = [c.strip() for c in chapters_str.split(',')] if chapters_str else []
+
+            json_path = generate_paper(
+                name_of_the_exam=exam_name,
+                subject=subject,
+                grade=grade,
+                board=board,
+                chapters=chapters
+            )
+            session['subject'] = subject
+            session['grade'] = grade
+            session['board'] = board
+            session['chapters'] = chapters
+        else:
+            difficulty = request.form.get('difficulty')
+            exam_format = request.form.get('exam_format')
+
+            json_path = generate_paper(
+                name_of_the_exam=exam_name, 
+                difficulty_level=difficulty, 
+                format_of_the_exam=exam_format
+            )
+            session['difficulty'] = difficulty
+            session['exam_format'] = exam_format
+
         session['json_path'] = json_path
         session['exam_name'] = exam_name
-        session['difficulty'] = difficulty
-        session['exam_format'] = exam_format
         
+        if not json_path:
+            flash('Could not generate the exam. Please check your inputs.', 'danger')
+            return redirect(url_for('exam_setup'))
+
         if exam_mode == 'online':
             return redirect(url_for('online_exam'))
         else:  # offline

@@ -20,27 +20,70 @@
                             <option value="JEE_MAINS">JEE Mains</option>
                             <option value="JEE_ADVANCED">JEE Advanced</option>
                             <option value="NEET_UG">NEET UG</option>
+                            <option value="SCHOOL_QUIZ">School Quiz</option>
+                            <option value="SCHOOL_TEST">School Test</option>
                         </select>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="difficulty" class="form-label">Difficulty Level</label>
-                        <select class="form-select" id="difficulty" name="difficulty" required>
-                            <option value="" selected disabled>Select difficulty level</option>
-                            <option value="easy">Easy</option>
-                            <option value="medium">Medium</option>
-                            <option value="hard">Hard</option>
-                        </select>
+                    <div id="competitive_fields">
+                        <div class="mb-3">
+                            <label for="difficulty" class="form-label">Difficulty Level</label>
+                            <select class="form-select" id="difficulty" name="difficulty">
+                                <option value="" selected disabled>Select difficulty level</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="exam_format" class="form-label">Exam Format</label>
+                            <select class="form-select" id="exam_format" name="exam_format">
+                                <option value="" selected disabled>Select exam format</option>
+                                <option value="MCQ">Multiple Choice Questions</option>
+                                <option value="subjective">Subjective Questions</option>
+                                <option value="mixed">Mixed (MCQ + Subjective)</option>
+                            </select>
+                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="exam_format" class="form-label">Exam Format</label>
-                        <select class="form-select" id="exam_format" name="exam_format" required>
-                            <option value="" selected disabled>Select exam format</option>
-                            <option value="MCQ">Multiple Choice Questions</option>
-                            <option value="subjective">Subjective Questions</option>
-                            <option value="mixed">Mixed (MCQ + Subjective)</option>
-                        </select>
+
+                    <div id="school_fields" style="display: none;">
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-select" id="subject" name="subject">
+                                <option value="" selected disabled>Select a subject</option>
+                                <option value="BIOLOGY">Biology</option>
+                                <option value="CHEMISTRY">Chemistry</option>
+                                <option value="ENGLISH">English</option>
+                                <option value="MATHEMATICS">Mathematics</option>
+                                <option value="PHYSICS">Physics</option>
+                                <option value="SOCIAL_SCIENCE">Social Science</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="grade" class="form-label">Grade</label>
+                            <select class="form-select" id="grade" name="grade">
+                                <option value="" selected disabled>Select a grade</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="board" class="form-label">Board</label>
+                            <select class="form-select" id="board" name="board">
+                                <option value="" selected disabled>Select a board</option>
+                                <option value="CBSE">CBSE</option>
+                                <option value="ICSE">ICSE</option>
+                                <option value="STATE">STATE</option>
+                                <option value="TSBIE">TSBIE</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="chapters" class="form-label">Chapters (comma-separated with .pdf extension)</label>
+                            <input type="text" class="form-control" id="chapters" name="chapters" placeholder="e.g., Motion.pdf,Matteraroundus.pdf">
+                        </div>
                     </div>
                     
                     <div class="alert alert-info">
@@ -63,4 +106,43 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('exam_name').addEventListener('change', function () {
+        var competitiveFields = document.getElementById('competitive_fields');
+        var schoolFields = document.getElementById('school_fields');
+        
+        var difficulty = document.getElementById('difficulty');
+        var exam_format = document.getElementById('exam_format');
+        
+        var subject = document.getElementById('subject');
+        var grade = document.getElementById('grade');
+        var board = document.getElementById('board');
+        var chapters = document.getElementById('chapters');
+
+        if (this.value === 'SCHOOL_QUIZ' || this.value === 'SCHOOL_TEST') {
+            competitiveFields.style.display = 'none';
+            schoolFields.style.display = 'block';
+            
+            difficulty.required = false;
+            exam_format.required = false;
+
+            subject.required = true;
+            grade.required = true;
+            board.required = true;
+            chapters.required = true;
+        } else {
+            competitiveFields.style.display = 'block';
+            schoolFields.style.display = 'none';
+
+            difficulty.required = true;
+            exam_format.required = true;
+
+            subject.required = false;
+            grade.required = false;
+            board.required = false;
+            chapters.required = false;
+        }
+    });
+</script>
 {% endblock %}

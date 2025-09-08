@@ -1,7 +1,7 @@
 import os
 import re
 import json
-from typing import List
+from typing import List, Optional
 from google import genai
 from pydantic import BaseModel
 from datetime import datetime
@@ -10,6 +10,24 @@ from PyPDF2 import PdfReader
 from google.genai import types
 import httpx
 import pathlib
+
+# --- From school_paper.py ---
+class SchoolQuizFormat(BaseModel):
+    question_number : str
+    question: str
+    options: List[str] or None
+    answer: str
+    solution: str
+
+class SchoolTestFormat(BaseModel):
+    question_number : str
+    question: str
+    answer: str
+
+SUBJECTS = ['BIOLOGY', 'CHEMISTRY', 'ENGLISH', 'MATHEMATICS', 'PHYSICS', 'SOCIAL_SCIENCE']
+GRADE = ['9', '10', '11', '12']
+BOARD = ['CBSE', 'ICSE', 'STATE','TSBIE']
+LANGUAGE = ['ENG', 'HIN', 'TEL']
 
 model = "gemini-2.5-flash-lite"
 
@@ -38,7 +56,7 @@ class OfflineSubjectiveExamResponse(BaseModel):
     reason : str
     solution : str
 
-jee_mains_context = """
+jee_mains_context = '''
 The JEE Mains paper typically consists of three sections: Physics, Chemistry, and Mathematics. Each section contains multiple-choice questions (MCQs) and numerical value-based questions. The exam is conducted in a computer-based format.
 I want you to generate a paper for JEE Mains with the following specifications:\n
 I want you to generate a full length jee mains question paper\n
@@ -47,9 +65,9 @@ It should have a total of 90 questions, with 30 questions from each subject (Phy
 - Question Types:
 - MCQs (with four options, one correct)  
 - Numerical value-based questions (no options, answer is a number)
-"""
+'''
 
-jee_advanced_context = """
+jee_advanced_context = '''
 The JEE Advanced paper is designed for admission to the prestigious Indian Institutes of Technology (IITs). It consists of two papers, each with three sections: Physics, Chemistry, and Mathematics. The questions include multiple-choice questions (MCQs), numerical value-based questions, and matching-type questions. The exam is conducted in a computer-based format.
 I want you to generate a paper for JEE Advanced with the following specifications:\n
 I want you to generate a full length JEE Advanced question paper\n
@@ -59,8 +77,8 @@ Each paper should have a total of 54 questions, with 18 questions from each subj
         - MCQs (with four options, one or more correct)
         - Numerical value-based questions (no options, answer is a number)
         - Matching-type questions (match the following)
-"""
-neet_ug_context = """
+'''
+neet_ug_context = '''
 The NEET (National Eligibility cum Entrance Test) paper is for admission to medical courses in India. It consists of four sections: Physics, Chemistry, Botany, and Zoology. Each section contains multiple-choice questions (MCQs) with four options and one correct answer. The exam is conducted in a pen-and-paper format.
 I want you to generate a paper for NEET with the following specifications:\n
 I want you to generate a full length NEET question paper\n
@@ -68,7 +86,7 @@ It should have a total of 200 questions, with 50 questions from each subject (Ph
 - Total Questions: 200 (50 per subject; candidates can attempt 180)
     - Question Types:
         - MCQs (with four options, one correct)
-"""
+'''
 
 with open("apikey.txt", 'r') as f:
     api_key = f.read().strip()
@@ -116,28 +134,21 @@ def load_papers(directory: str) -> List[str]:
         print(f"Error loading papers: {e}")
         return []
 
-def generate_paper(name_of_the_exam: str, difficulty_level: str, format_of_the_exam: str):
-    print("Generating paper for:", name_of_the_exam, "with difficulty level:", difficulty_level, "and format:", format_of_the_exam)
+def generate_paper(name_of_the_exam: str, difficulty_level: Optional[str] = None, format_of_the_exam: Optional[str] = None, subject: Optional[str] = None, grade: Optional[str] = None, board: Optional[str] = None, chapters: Optional[List[str]] = None, language: str = 'ENG'):
     """
     Generates a paper based on the provided parameters.
-
-    Args:
-        name_of_the_exam (str): Name of the exam.
-        difficulty_level (str): Difficulty level of the exam.
-        format_of_the_exam (str): Format of the exam.
-
-    Returns:
-        str: Path to the generated JSON file.
     """
+    print("Generating paper for:", name_of_the_exam)
     response = None
     exam_upper = name_of_the_exam.upper()
+
     if exam_upper == "JEE_MAINS":
-        JEE_MAINS_PROMPT = f"""
+        JEE_MAINS_PROMPT = f'''
             You are an expert in creating high-quality exam papers for competitive exams like
                              {exam_upper}
                              Generate a paper with {difficulty_level} difficulty level and format {format_of_the_exam}
                              {jee_mains_context}
-            """
+            '''
         response = client.models.generate_content(
             model=model,
             contents=[JEE_MAINS_PROMPT, jee_mains_context],
@@ -170,23 +181,98 @@ def generate_paper(name_of_the_exam: str, difficulty_level: str, format_of_the_e
                 "response_schema": list[PaperFormatForMCQ],
             },
         )
+    elif exam_upper == "SCHOOL_QUIZ":
+        prompt = '''
+        You are an intelligent AI whose main job is to generate test for school students,
+        you will be given their !textbook chapter or the textbook itself so
+        you can take that as context and generate questions based on them,
+        mind the grade of the student too, make sure the questions are of good quality and adhere to safety
+        standards, make sure you reply in the proper format.
+        Give your questions based on the activity sections of the chapter
+        generate about 20 questions.'''
 
-    # Determine output directory structure to avoid overwrites and to keep papers organized
+        if subject.upper() in SUBJECTS and grade in GRADE and board.upper() in BOARD and language.upper() in LANGUAGE:
+            content = [prompt,
+                       f"You are generating a school quiz for {subject.upper()} grade {grade} board {board.upper()}"]
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+            for chapter in chapters:
+                pdf_path = os.path.join(context_dir, chapter)
+                print(f"Resolved PDF path: {pdf_path}")
+                if os.path.exists(pdf_path):
+                    chapter_file = pathlib.Path(pdf_path)
+                    uploaded_file = client.files.upload(file=chapter_file)
+                    content.append(uploaded_file)
+                else:
+                    print(f"File not found: {pdf_path}")
+            response = client.models.generate_content(
+                    model=model,
+                    contents= content,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_schema": list[SchoolQuizFormat],
+                    },
+                )
+    elif exam_upper == "SCHOOL_TEST":
+        prompt = '''
+        You are an intelligent AI whose main job is to generate test for school students,
+        you will be given their !textbook chapter or the textbook itself so
+        you can take that as context and generate questions based on them,
+        mind the grade of the student too, make sure the questions a
+        re of good quality and adhere to safety
+        standards, make sure you reply in the proper format.
+        Give your questions based on the exercise sections of the chapter
+        generate about 10 questions.'''
+
+        if subject.upper() in SUBJECTS and grade in GRADE and board.upper() in BOARD and language.upper() in LANGUAGE:
+            content = [prompt,
+                       f"You are generating a school test for {subject.upper()} grade {grade} board {board.upper()}"]
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+            for chapter in chapters:
+                pdf_path = os.path.join(context_dir, chapter)
+                print(f"Resolved PDF path: {pdf_path}")
+                if os.path.exists(pdf_path):
+                    chapter_file = pathlib.Path(pdf_path)
+                    uploaded_file = client.files.upload(file=chapter_file)
+                    content.append(uploaded_file)
+                else:
+                    print(f"File not found: {pdf_path}")
+            response = client.models.generate_content(
+                    model=model,
+                    contents= content,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_schema": list[SchoolTestFormat],
+                    },
+                )
+
+    if response is None:
+        print(f"Could not generate paper for exam type: {name_of_the_exam}. Check parameters.")
+        return None
+
+    # Determine output directory structure
     base_output_dir = os.path.join("GENERATED_PAPERS", "JSON")
     exam_dir_map = {
         "JEE_MAINS": "MAINS",
         "JEE_ADVANCED": "ADVANCED",
         "NEET_UG": "NEET",
+        "SCHOOL_QUIZ": os.path.join("SCHOOL", "QUIZ"),
+        "SCHOOL_TEST": os.path.join("SCHOOL", "TEST"),
     }
     sub_dir = exam_dir_map.get(exam_upper, "MISC")
     output_dir = os.path.join(base_output_dir, sub_dir)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Build a unique, non-overwriting filename
+    # Build a unique filename
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    safe_difficulty = str(difficulty_level)
-    safe_format = str(format_of_the_exam)
-    base_name = f"{exam_upper}_{safe_difficulty}_{safe_format}_{ts}.json"
+    if exam_upper in ["SCHOOL_QUIZ", "SCHOOL_TEST"]:
+        base_name = f"{exam_upper}_{subject}_{grade}_{board}_{ts}.json"
+    else:
+        safe_difficulty = str(difficulty_level)
+        safe_format = str(format_of_the_exam)
+        base_name = f"{exam_upper}_{safe_difficulty}_{safe_format}_{ts}.json"
+    
     filepath = os.path.join(output_dir, base_name)
 
     # Write generated paper to JSON file
@@ -194,6 +280,7 @@ def generate_paper(name_of_the_exam: str, difficulty_level: str, format_of_the_e
         text = str(response.text)
         f.write(text)
     return filepath
+
 
 def offline_scoring(actual_solution: str, users_solution: str):
     prompt = (
@@ -222,5 +309,3 @@ def offline_scoring(actual_solution: str, users_solution: str):
         score_sheet = str(response.text)
         f.write(score_sheet)
     return out_path
-
-
