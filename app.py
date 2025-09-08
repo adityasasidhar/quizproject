@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, jsonify, send_file, redirect,
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.generate_paper import generate_paper
+from src.utils import *
 from google import genai
 import tempfile
 from werkzeug.utils import secure_filename
@@ -140,6 +141,8 @@ def generate_exam():
         session['exam_format'] = exam_format
 
     session['json_path'] = json_path
+    # Initialize answers_uploaded to False when a new exam is generated
+    session['answers_uploaded'] = False
     
     if not json_path:
         flash('Could not generate the exam. Please check your inputs.', 'danger')
@@ -226,21 +229,53 @@ def offline_exam():
     with open(json_path, 'r') as f:
         questions = json.load(f)
     
+    answers_uploaded = session.get('answers_uploaded', False)
+    
     return render_template('offline_exam.html', 
                           questions=questions, 
-                          json_path=json_path)
+                          json_path=json_path,
+                          answers_uploaded=answers_uploaded)
 
-@app.route('/download_exam')
+@app.route('/download_question_paper')
 @login_required
-def download_exam():
-    """Download the generated exam paper as JSON"""
+def download_question_paper():
+    """Download the generated question paper as PDF"""
     json_path = session.get('json_path')
     
     if not json_path or not os.path.exists(json_path):
         flash('Exam session not found or expired. Please start a new exam.', 'warning')
         return redirect(url_for('index'))
     
-    return send_file(json_path, as_attachment=True)
+    question_pdf_path, _ = extract_and_convert(json_path)
+    
+    if question_pdf_path and os.path.exists(question_pdf_path):
+        return send_file(question_pdf_path, as_attachment=True, download_name='question_paper.pdf')
+    else:
+        flash('Could not generate question paper PDF.', 'danger')
+        return redirect(url_for('offline_exam'))
+
+@app.route('/download_answer_sheet')
+@login_required
+def download_answer_sheet():
+    """Download the generated answer sheet as PDF"""
+    json_path = session.get('json_path')
+    
+    if not json_path or not os.path.exists(json_path):
+        flash('Exam session not found or expired. Please start a new exam.', 'warning')
+        return redirect(url_for('index'))
+    
+    # Only allow download if answers have been uploaded
+    if not session.get('answers_uploaded'):
+        flash('Please upload your answers first to download the answer sheet.', 'warning')
+        return redirect(url_for('offline_exam'))
+
+    _, answer_pdf_path = extract_and_convert(json_path)
+    
+    if answer_pdf_path and os.path.exists(answer_pdf_path):
+        return send_file(answer_pdf_path, as_attachment=True, download_name='answer_sheet.pdf')
+    else:
+        flash('Could not generate answer sheet PDF.', 'danger')
+        return redirect(url_for('offline_exam'))
 
 @app.route('/upload_answers', methods=['GET', 'POST'])
 @login_required
@@ -302,6 +337,9 @@ def upload_answers():
                     score = sum(1 for r in results if r.get('is_correct', False))
                     total = len(results)
                     percentage = (score / total) * 100 if total > 0 else 0
+
+                    # Set session flag after successful upload
+                    session['answers_uploaded'] = True
                     
                     return render_template('results.html', 
                                           results=results, 

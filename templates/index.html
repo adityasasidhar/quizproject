@@ -1,55 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}Exam Generator - Home{% endblock %}
+{% block title %}ExamCraft - Home{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="text-center mb-5">
-        <h2>Welcome to the Exam Generator</h2>
-        <p class="lead">Select an exam category to begin</p>
-    </div>
+<div class="hero-section text-center py-5 mb-5">
+    <h1 class="display-4 fw-bold text-primary">Welcome to ExamCraft!</h1>
+    <p class="lead text-muted">Your ultimate platform for exam preparation and skill assessment.</p>
+    <a href="#exam-categories" class="btn btn-primary btn-lg mt-3">Explore Exams</a>
+</div>
 
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-atom fa-3x text-primary mb-3"></i>
-                    <h5 class="card-title">JEE Mains</h5>
-                    <p class="card-text">Engineering entrance exam with MCQs and numerical questions.</p>
-                    <a href="{{ url_for('exam_selection', exam_type='JEE_MAINS') }}" class="btn btn-primary">Select</a>
+<div class="container" id="exam-categories">
+    <h2 class="text-center mb-5 fw-bold">Choose Your Exam Category</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div class="col">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <i class="fas fa-atom fa-4x text-info mb-3"></i>
+                        <h5 class="card-title fw-bold">JEE Mains</h5>
+                        <p class="card-text text-muted">Engineering entrance exam with MCQs and numerical questions.</p>
+                    </div>
+                    <a href="{{ url_for('exam_selection', exam_type='JEE_MAINS') }}" class="btn btn-info mt-3">Select</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-rocket fa-3x text-success mb-3"></i>
-                    <h5 class="card-title">JEE Advanced</h5>
-                    <p class="card-text">Advanced engineering entrance exam for IITs.</p>
-                    <a href="{{ url_for('exam_selection', exam_type='JEE_ADVANCED') }}" class="btn btn-success">Select</a>
+        <div class="col">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <i class="fas fa-rocket fa-4x text-success mb-3"></i>
+                        <h5 class="card-title fw-bold">JEE Advanced</h5>
+                        <p class="card-text text-muted">Advanced engineering entrance exam for IITs.</p>
+                    </div>
+                    <a href="{{ url_for('exam_selection', exam_type='JEE_ADVANCED') }}" class="btn btn-success mt-3">Select</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
-                    <h5 class="card-title">NEET UG</h5>
-                    <p class="card-text">Medical entrance exam for undergraduate courses.</p>
-                    <a href="{{ url_for('exam_selection', exam_type='NEET_UG') }}" class="btn btn-danger">Select</a>
+        <div class="col">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <i class="fas fa-heartbeat fa-4x text-danger mb-3"></i>
+                        <h5 class="card-title fw-bold">NEET UG</h5>
+                        <p class="card-text text-muted">Medical entrance exam for undergraduate courses.</p>
+                    </div>
+                    <a href="{{ url_for('exam_selection', exam_type='NEET_UG') }}" class="btn btn-danger mt-3">Select</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 text-center">
-                <div class="card-body">
-                    <i class="fas fa-school fa-3x text-info mb-3"></i>
-                    <h5 class="card-title">School Exams</h5>
-                    <p class="card-text">Quizzes and tests for school students from grades 9-12.</p>
-                    <a href="{{ url_for('exam_selection', exam_type='SCHOOL') }}" class="btn btn-info">Select</a>
+        <div class="col">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <i class="fas fa-school fa-4x text-warning mb-3"></i>
+                        <h5 class="card-title fw-bold">School Exams</h5>
+                        <p class="card-text text-muted">Quizzes and tests for school students from grades 9-12.</p>
+                    </div>
+                    <a href="{{ url_for('exam_selection', exam_type='SCHOOL') }}" class="btn btn-warning mt-3">Select</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Optional: Smooth scroll to exam categories section
+    document.querySelector('a[href="#exam-categories"]').addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+</script>
 {% endblock %}

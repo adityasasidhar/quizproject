@@ -209,3 +209,4 @@ def extract_and_convert(filepath):
         answer_pdf.output(answer_pdf_path)
 
         return question_pdf_path, answer_pdf_path
+

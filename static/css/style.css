@@ -1,158 +1,58 @@
-/* Main Styles for Exam Generator Application */
-
-/* General Styles */
+/* General Body Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #f0f4f8;
     color: #333;
-    transition: background-color 0.3s, color 0.3s;
 }
 
-.dark-theme {
-    background-color: #333;
-    color: #f5f5f5;
+/* Navbar Styles */
+.navbar-dark .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
 }
 
-.container {
-    max-width: 1200px;
+.navbar-dark .nav-link {
+    font-weight: 500;
 }
 
 /* Card Styles */
 .card {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border: none;
-    margin-bottom: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.07);
 }
 
 .card-header {
-    font-weight: 500;
+    border-radius: 15px 15px 0 0;
+    font-weight: 600;
 }
 
 /* Button Styles */
 .btn {
-    border-radius: 4px;
-    font-weight: 500;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-.btn-success {
-    background-color: #198754;
-    border-color: #198754;
-}
-
-.btn-success:hover {
-    background-color: #157347;
-    border-color: #146c43;
+    background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+    border: none;
 }
 
 /* Form Styles */
-.form-control:focus, .form-select:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+.form-control {
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    border: 1px solid #ced4da;
 }
 
-/* Question Card Styles */
-.question-card {
-    margin-bottom: 1.5rem;
-    transition: transform 0.2s;
-}
-
-.question-card:hover {
-    transform: translateY(-2px);
-}
-
-/* Navigation */
-.navbar {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand {
-    font-weight: 600;
-    font-size: 1.5rem;
-}
-
-/* Footer */
-footer {
-    margin-top: 2rem;
-    padding: 1rem 0;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .card-title {
-        font-size: 1.25rem;
-    }
-    
-    .score-percentage {
-        font-size: 2rem !important;
-    }
-}
-
-/* Bootstrap Icons (for compatibility) */
-.bi {
-    display: inline-block;
-    vertical-align: -0.125em;
-}
-
-.bi-download::before {
-    content: "↓";
-    font-weight: bold;
-    margin-right: 0.25rem;
-}
-
-.bi-cloud-arrow-up::before {
-    content: "↑";
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-/* Exam Results Page */
-.score-percentage {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #0d6efd;
-}
-
-.correct-answer {
-    color: #198754;
-    font-weight: 500;
-}
-
-.incorrect-answer {
-    color: #dc3545;
-    font-weight: 500;
-}
-
-/* Upload Page */
-.upload-area {
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s;
-}
-
-.upload-area:hover {
-    border-color: #0d6efd;
-    background-color: #f8f9fa;
-}
-
-/* Timer */
-.timer {
-    font-family: monospace;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: white;
+.form-control:focus {
+    border-color: #5a78f0;
+    box-shadow: 0 0 0 0.25rem rgba(90, 120, 240, 0.25);
 }

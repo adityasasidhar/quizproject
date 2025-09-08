@@ -1,4 +1,4 @@
-# Exam Generator
+# ExamCraft
 
 A Flask-based interface for generating and taking exams, with both online and offline modes.
 
@@ -16,7 +16,7 @@ A Flask-based interface for generating and taking exams, with both online and of
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd QuizProject
+   cd ExamCraft
    ```
 
 2. Create a virtual environment and activate it:
