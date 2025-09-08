@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Selection{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    body {
+        background-color: #f0f4f8;
+    }
+
+    .card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+        color: white;
+        border-bottom: none;
+        padding: 2rem;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .card-body {
+        padding: 2.5rem;
+    }
+
+    .form-section {
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e0e6ed;
+    }
+
+    .form-section h4 {
+        margin-bottom: 1.5rem;
+        color: #333;
+        font-weight: 700;
+        border-bottom: 3px solid #5a78f0;
+        padding-bottom: 0.75rem;
+    }
+
+    .selection-box-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .selection-box {
+        flex: 1 1 130px;
+        background-color: #f8f9fa;
+        border: 2px solid #e0e6ed;
+        border-radius: 12px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .selection-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .selection-box.selected {
+        background-color: #5a78f0;
+        color: white;
+        border-color: #5a78f0;
+        font-weight: 700;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(90, 120, 240, 0.4);
+    }
+
+    .selection-box input[type="radio"] {
+        display: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+        border: none;
+        border-radius: 50px;
+        padding: 0.85rem 2rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(90, 120, 240, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(90, 120, 240, 0.5);
+    }
+
+    .btn-secondary {
+        border-radius: 50px;
+        padding: 0.85rem 2rem;
+        font-weight: 600;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        border: 1px solid #ced4da;
+    }
+
+    .form-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center mb-0">Configure Your {{ exam_type.replace('_', ' ') | title }} Exam</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('generate_exam') }}">
+                        <input type="hidden" name="exam_name" value="{{ exam_type }}">
+
+                        {% if exam_type in ['JEE_MAINS', 'JEE_ADVANCED', 'NEET_UG'] %}
+                            <div class="form-section">
+                                <h4>Exam Details</h4>
+                                <div class="mb-4">
+                                    <label class="form-label">Difficulty Level</label>
+                                    <div class="selection-box-container" id="difficulty-selection">
+                                        <div class="selection-box" data-value="easy">Easy</div>
+                                        <div class="selection-box" data-value="medium">Medium</div>
+                                        <div class="selection-box" data-value="hard">Hard</div>
+                                    </div>
+                                    <input type="hidden" name="difficulty" id="difficulty" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Exam Format</label>
+                                    <div class="selection-box-container" id="format-selection">
+                                        <div class="selection-box" data-value="MCQ">Multiple Choice</div>
+                                        <div class="selection-box" data-value="subjective">Subjective</div>
+                                        <div class="selection-box" data-value="mixed">Mixed</div>
+                                    </div>
+                                    <input type="hidden" name="exam_format" id="exam_format" required>
+                                </div>
+                            </div>
+                        {% elif exam_type == 'SCHOOL' %}
+                            <div class="form-section">
+                                <h4>Exam Configuration</h4>
+                                <div class="mb-4">
+                                    <label class="form-label">Exam Type</label>
+                                    <div class="selection-box-container" id="school-exam-type-selection">
+                                        <div class="selection-box" data-value="SCHOOL_QUIZ">School Quiz</div>
+                                        <div class="selection-box" data-value="SCHOOL_TEST">School Test</div>
+                                    </div>
+                                    <input type="hidden" name="school_exam_type" id="school_exam_type" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Subject</label>
+                                    <div class="selection-box-container" id="subject-selection">
+                                        <div class="selection-box" data-value="BIOLOGY">Biology</div>
+                                        <div class="selection-box" data-value="CHEMISTRY">Chemistry</div>
+                                        <div class="selection-box" data-value="ENGLISH">English</div>
+                                        <div class="selection-box" data-value="MATHEMATICS">Mathematics</div>
+                                        <div class="selection-box" data-value="PHYSICS">Physics</div>
+                                        <div class="selection-box" data-value="SOCIAL_SCIENCE">Social Science</div>
+                                    </div>
+                                    <input type="hidden" name="subject" id="subject" required>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4>Academic Details</h4>
+                                <div class="mb-4">
+                                    <label class="form-label">Grade</label>
+                                    <div class="selection-box-container" id="grade-selection">
+                                        <div class="selection-box" data-value="9">9th</div>
+                                        <div class="selection-box" data-value="10">10th</div>
+                                        <div class="selection-box" data-value="11">11th</div>
+                                        <div class="selection-box" data-value="12">12th</div>
+                                    </div>
+                                    <input type="hidden" name="grade" id="grade" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Board</label>
+                                    <div class="selection-box-container" id="board-selection">
+                                        <div class="selection-box" data-value="CBSE">CBSE</div>
+                                        <div class="selection-box" data-value="ICSE">ICSE</div>
+                                        <div class="selection-box" data-value="STATE">STATE</div>
+                                        <div class="selection-box" data-value="TSBIE">TSBIE</div>
+                                    </div>
+                                    <input type="hidden" name="board" id="board" required>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <h4>Syllabus</h4>
+                                <div class="mb-3">
+                                    <label for="chapters" class="form-label">Chapters (comma-separated)</label>
+                                    <input type="text" class="form-control" id="chapters" name="chapters" placeholder="e.g., Motion, Matter around us" required>
+                                    <div class="form-text">Please enter chapter names exactly as they appear in your textbook.</div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="form-section">
+                            <h4>Exam Mode</h4>
+                            <div class="selection-box-container" id="mode-selection">
+                                <div class="selection-box selected" data-value="online">Online</div>
+                                <div class="selection-box" data-value="offline">Offline</div>
+                            </div>
+                            <input type="hidden" name="exam_mode" id="exam_mode" value="online" required>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Generate Exam</button>
+                            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function handleSelection(containerId, inputId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const input = document.getElementById(inputId);
+        const boxes = container.querySelectorAll('.selection-box');
+
+        // Pre-select if a value is already set (for example, in exam_mode)
+        const initialValue = input.value;
+        if (initialValue) {
+            boxes.forEach(box => {
+                if (box.dataset.value === initialValue) {
+                    box.classList.add('selected');
+                }
+            });
+        }
+
+        boxes.forEach(box => {
+            box.addEventListener('click', function() {
+                boxes.forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                input.value = this.dataset.value;
+            });
+        });
+    }
+
+    // Competitive Exams
+    handleSelection('difficulty-selection', 'difficulty');
+    handleSelection('format-selection', 'exam_format');
+
+    // School Exams
+    handleSelection('school-exam-type-selection', 'school_exam_type');
+    handleSelection('subject-selection', 'subject');
+    handleSelection('grade-selection', 'grade');
+    handleSelection('board-selection', 'board');
+
+    // Common
+    handleSelection('mode-selection', 'exam_mode');
+});
+</script>
+{% endblock %}

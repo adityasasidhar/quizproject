@@ -4,128 +4,132 @@
 
 {% block head %}
 <style>
+    body {
+        background-color: #f0f4f8;
+    }
     .result-card {
         margin-bottom: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border: 1px solid #e0e6ed;
+    }
+    .result-card.correct {
+        border-left: 5px solid #28a745;
+    }
+    .result-card.incorrect {
+        border-left: 5px solid #dc3545;
     }
     .question-number {
         font-weight: bold;
         margin-right: 0.5rem;
+        color: #007bff;
     }
-    .correct-answer {
-        color: #198754;
+    .correct-answer-text {
+        color: #28a745;
         font-weight: bold;
     }
-    .incorrect-answer {
+    .incorrect-answer-text {
         color: #dc3545;
         font-weight: bold;
     }
-    .score-card {
-        font-size: 1.2rem;
+    .score-summary-card {
+        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
     }
     .score-percentage {
-        font-size: 2.5rem;
-        font-weight: bold;
+        font-size: 4rem;
+        font-weight: 700;
     }
     .score-details {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     .solution {
-        color: #198754;
-        font-weight: bold;
+        background-color: #e9f5ff;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 8px;
+    }
+    .btn-primary.rounded-pill {
+        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+        border: none;
+        padding: 0.85rem 2rem;
+        font-weight: 700;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">Exam Results</h2>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 text-center">
-                        <div class="score-percentage">{{ percentage|round(1) }}%</div>
-                        <div class="score-details">
-                            <span class="badge bg-success">{{ score }} correct</span> out of 
-                            <span class="badge bg-secondary">{{ total }} questions</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="score-card">
-                            {% if percentage >= 90 %}
-                                <div class="alert alert-success">
-                                    <strong>Excellent!</strong> You've demonstrated exceptional understanding of the material.
-                                </div>
-                            {% elif percentage >= 75 %}
-                                <div class="alert alert-success">
-                                    <strong>Great job!</strong> You have a strong grasp of the material.
-                                </div>
-                            {% elif percentage >= 60 %}
-                                <div class="alert alert-warning">
-                                    <strong>Good effort!</strong> You understand most of the material, but there's room for improvement.
-                                </div>
-                            {% else %}
-                                <div class="alert alert-danger">
-                                    <strong>Keep studying!</strong> You might need to review the material more thoroughly.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="score-summary-card text-center">
+                <h2 class="mb-3">Your Exam Result</h2>
+                <div class="score-percentage">{{ percentage|round(1) }}%</div>
+                <div class="score-details">
+                    You answered <span class="badge bg-light text-dark">{{ score }}</span> correctly out of 
+                    <span class="badge bg-light text-dark">{{ total }}</span> questions.
                 </div>
-            </div>
-        </div>
-
-        <h3 class="mb-3">Detailed Results</h3>
-        
-        {% for result in results %}
-        <div class="card result-card">
-            <div class="card-header">
-                <span class="question-number">Question {{ result.question_number }}:</span>
-                {{ result.question }}
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p>
-                            <strong>Your Answer:</strong> 
-                            <span class="{{ 'correct-answer' if result.is_correct else 'incorrect-answer' }}">
-                                {{ result.user_answer if result.user_answer else 'No answer provided' }}
-                            </span>
-                        </p>
-                    </div>
-                    <div class="col-md-6">
-                        <p>
-                            <strong>Correct Answer:</strong> 
-                            <span class="correct-answer">{{ result.correct_answer }}</span>
-                        </p>
-                    </div>
-                </div>
-                
-                {% if not result.is_correct %}
-                <div class="alert alert-info mt-2">
-                    <strong>Explanation:</strong> The correct answer is {{ result.correct_answer }}.
-                    {% if is_uploaded is defined and is_uploaded %}
+                <div class="mt-4">
+                    {% if percentage >= 90 %}
+                        <p class="lead"><strong>Excellent!</strong> You've demonstrated exceptional understanding.</p>
+                    {% elif percentage >= 75 %}
+                        <p class="lead"><strong>Great job!</strong> You have a strong grasp of the material.</p>
+                    {% elif percentage >= 60 %}
+                        <p class="lead"><strong>Good effort!</strong> There's room for improvement.</p>
                     {% else %}
-                    <strong>Solution: </strong>
-                    <span class = "solution">
-                        {{ result.solution }}
-                    </span>
+                        <p class="lead"><strong>Keep studying!</strong> Review the material to improve your score.</p>
                     {% endif %}
                 </div>
+            </div>
+
+            <h3 class="mb-4">Detailed Results</h3>
+            
+            {% for result in results %}
+            <div class="card result-card {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
+                <div class="card-header bg-light">
+                    <span class="question-number">Question {{ result.question_number }}:</span>
+                    {{ result.question | safe }}
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Your Answer:</strong> 
+                                <span class="{% if result.is_correct %}correct-answer-text{% else %}incorrect-answer-text{% endif %}">
+                                    {{ result.user_answer if result.user_answer else 'No answer provided' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-0">
+                                <strong>Correct Answer:</strong> 
+                                <span class="correct-answer-text">{{ result.correct_answer }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if not result.is_correct and result.solution %}
+                    <div class="solution mt-3">
+                        <strong>Solution:</strong>
+                        <p class="mb-0">{{ result.solution | safe }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-grid gap-2 mt-5 mb-4">
+                <a href="{{ url_for('index') }}" class="btn btn-primary rounded-pill btn-lg">Return to Home</a>
+                {% if is_uploaded is defined and is_uploaded %}
+                <a href="{{ url_for('upload_answers') }}" class="btn btn-secondary rounded-pill">Upload Another</a>
+                {% else %}
+                <a href="{{ url_for('exam_selection', exam_type=session.get('exam_name')) }}" class="btn btn-secondary rounded-pill">Take Another Exam</a>
                 {% endif %}
             </div>
-        </div>
-        {% endfor %}
-
-        <div class="d-grid gap-2 mt-4 mb-5">
-            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Return to Home</a>
-            {% if is_uploaded is defined and is_uploaded %}
-            <a href="{{ url_for('upload_answers') }}" class="btn btn-secondary">Upload Another Answer Sheet</a>
-            {% else %}
-            <a href="{{ url_for('exam_setup') }}" class="btn btn-secondary">Take Another Exam</a>
-            {% endif %}
         </div>
     </div>
 </div>
