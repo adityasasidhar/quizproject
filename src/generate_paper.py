@@ -10,6 +10,9 @@ from PyPDF2 import PdfReader
 from google.genai import types
 import httpx
 import pathlib
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
 
 # --- From school_paper.py ---
 class SchoolQuizFormat(BaseModel):
@@ -88,8 +91,7 @@ It should have a total of 200 questions, with 50 questions from each subject (Ph
         - MCQs (with four options, one correct)
 '''
 
-with open("apikey.txt", 'r') as f:
-    api_key = f.read().strip()
+api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=api_key)
 print("API KEY LOADED")

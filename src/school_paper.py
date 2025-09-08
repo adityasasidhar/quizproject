@@ -11,6 +11,9 @@ from PyPDF2 import PdfReader
 from google.genai import types
 import httpx
 import pathlib
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
 
 class SchoolQuizFormat(BaseModel):
     question_number : str
@@ -26,8 +29,7 @@ class SchoolTestFormat(BaseModel):
 
 model = "gemini-2.5-flash-lite"
 
-with open("apikey.txt", 'r') as f:
-    api_key = f.read().strip()
+api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=api_key)
 print("API KEY LOADED")

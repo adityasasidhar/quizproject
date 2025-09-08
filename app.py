@@ -10,6 +10,9 @@ from google import genai
 import tempfile
 from werkzeug.utils import secure_filename
 from functools import wraps
+from dotenv import load_dotenv
+
+load_dotenv() # Load environment variables from .env file
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -17,8 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-with open("apikey.txt", 'r') as f:
-    api_key = f.read().strip()
+api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=api_key)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
