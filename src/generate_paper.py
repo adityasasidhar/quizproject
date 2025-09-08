@@ -195,36 +195,24 @@ def generate_paper(name_of_the_exam: str, difficulty_level: str, format_of_the_e
         f.write(text)
     return filepath
 
-
-def offline_scoring(filepath: str, raw_json_paper_path: str):
-    # Load the raw JSON paper if provided
-    data = None
-    if raw_json_paper_path and raw_json_paper_path.endswith(".json") and os.path.exists(raw_json_paper_path):
-        with open(raw_json_paper_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-
-    solution_sheet = json.dumps(data, indent=2) if data is not None else "{}"
-
+def offline_scoring(actual_solution: str, users_solution: str):
     prompt = (
         "I want you to look at actual score sheet and then compare it with the sheet "
         "uploaded by the student and give your response accordingly."
     )
+    user_solution = client.files.upload(file=users_solution)
+    actual_solution = client.files.upload(file=actual_solution)
 
-    # Upload user solution file (the path argument naming is a bit confusing; keeping for compatibility)
-    user_solution = client.files.upload(file=raw_json_paper_path)
-
-    contents = [prompt, solution_sheet, user_solution]
+    contents = [prompt, actual_solution, user_solution]
 
     response = client.models.generate_content(
-        model=model,
+        model= "gemini-2.5-flash-lite",
         contents=contents,
         config={
             "response_mime_type": "application/json",
             "response_schema": list[OfflineMCQExamResponse],
         }
     )
-
-    # Save the final result with a unique filename to avoid overwrites
     output_dir = "FINAL_RESULT_OFFLINE"
     os.makedirs(output_dir, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
