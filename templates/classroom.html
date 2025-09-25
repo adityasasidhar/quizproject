@@ -45,13 +45,14 @@
       </div>
     </div>
 
-    {% for p in posts %}
+    {% for p_data in posts %}
+      {% set p = p_data.obj %}
       <div class="card mb-3">
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
               <span class="badge {% if p.post_type == 'material' %}bg-success{% elif p.post_type == 'chat' %}bg-info{% else %}bg-primary{% endif %}">{{ p.post_type|capitalize }}</span>
-              <small class="text-muted ms-2">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+              <small class="text-muted ms-2">Posted by {{ p_data.user.username if p_data.user else 'Unknown' }} on {{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
             </div>
           </div>
           {% if p.content %}
@@ -70,6 +71,33 @@
               <a class="btn btn-sm btn-outline-secondary" href="{{ p.attachment_path }}" target="_blank">Open in new tab</a>
             </div>
           {% endif %}
+        </div>
+        <div class="card-footer bg-light">
+          <div class="d-flex align-items-center gap-3">
+            <form method="post" action="{{ url_for('react_to_post', class_id=classroom.id, post_id=p.id) }}" class="d-inline-block">
+                <button type="submit" name="reaction_type" value="👍" class="btn btn-sm btn-outline-primary">👍</button>
+                <button type="submit" name="reaction_type" value="❤️" class="btn btn-sm btn-outline-danger">❤️</button>
+                <button type="submit" name="reaction_type" value="😂" class="btn btn-sm btn-outline-success">😂</button>
+            </form>
+            <div class="d-flex gap-2">
+              {% for reaction in p_data.reactions %}
+                <span class="badge bg-secondary">{{ reaction.reaction_type }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          <hr>
+          <div class="comments-section">
+            {% for c_data in p_data.comments %}
+              <div class="comment mb-2">
+                <strong>{{ c_data.user.username if c_data.user else 'Unknown' }}:</strong>
+                <span>{{ c_data.obj.content }}</span>
+              </div>
+            {% endfor %}
+            <form method="post" action="{{ url_for('comment_on_post', class_id=classroom.id, post_id=p.id) }}" class="d-flex gap-2 mt-2">
+              <input type="text" name="content" class="form-control form-control-sm" placeholder="Add a comment...">
+              <button type="submit" class="btn btn-sm btn-primary">Comment</button>
+            </form>
+          </div>
         </div>
       </div>
     {% endfor %}

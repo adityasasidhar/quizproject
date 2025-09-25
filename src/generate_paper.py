@@ -197,7 +197,7 @@ def generate_paper(name_of_the_exam: str, difficulty_level: Optional[str] = None
             content = [prompt,
                        f"You are generating a school quiz for {subject.upper()} grade {grade} board {board.upper()}"]
             base_dir = os.path.dirname(os.path.abspath(__file__))
-            context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+            context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
             for chapter in chapters:
                 pdf_path = os.path.join(context_dir, chapter)
                 print(f"Resolved PDF path: {pdf_path}")
@@ -230,7 +230,7 @@ def generate_paper(name_of_the_exam: str, difficulty_level: Optional[str] = None
             content = [prompt,
                        f"You are generating a school test for {subject.upper()} grade {grade} board {board.upper()}"]
             base_dir = os.path.dirname(os.path.abspath(__file__))
-            context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+            context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
             for chapter in chapters:
                 pdf_path = os.path.join(context_dir, chapter)
                 print(f"Resolved PDF path: {pdf_path}")

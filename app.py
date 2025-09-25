@@ -250,7 +250,7 @@ def submit_exam():
         try:
             user = get_current_user()
             assignment = Assignment.query.get(assignment_id)
-            now = datetime.utcnow()
+            now = datetime.now()
             # Enforce opens/due at submission
             if assignment:
                 if assignment.opens_at and now < assignment.opens_at:
@@ -484,6 +484,27 @@ class ClassPost(db.Model):
     post_type = db.Column(db.String(20), default='post')  # 'post', 'chat', 'material'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class PostReaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('class_post.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reaction_type = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PostComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('class_post.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class CommentReaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('post_comment.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reaction_type = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Assignment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -693,28 +714,75 @@ def classroom_view(class_id):
     classroom, membership, redirect_resp = require_membership(class_id)
     if redirect_resp:
         return redirect_resp
-    posts = ClassPost.query.filter_by(classroom_id=classroom.id).order_by(ClassPost.created_at.desc()).all()
+    posts_query = ClassPost.query.filter_by(classroom_id=classroom.id).order_by(ClassPost.created_at.desc()).all()
     assignments = Assignment.query.filter_by(classroom_id=classroom.id).order_by(Assignment.created_at.desc()).all()
     is_teacher = membership.role == 'teacher'
 
-    # Build student submissions map and generate due reminders
     user = get_current_user()
-    now = datetime.utcnow()
+    now = datetime.now()
+
+    post_ids = [p.id for p in posts_query]
+    reactions = PostReaction.query.filter(PostReaction.post_id.in_(post_ids)).all() if post_ids else []
+    comments = PostComment.query.filter(PostComment.post_id.in_(post_ids)).order_by(PostComment.created_at.asc()).all() if post_ids else []
+    comment_ids = [c.id for c in comments]
+    comment_reactions = CommentReaction.query.filter(CommentReaction.comment_id.in_(comment_ids)).all() if comment_ids else []
+    user_ids = set([r.user_id for r in reactions]) | set([c.user_id for c in comments]) | set([cr.user_id for cr in comment_reactions]) | set([p.user_id for p in posts_query])
+    users = User.query.filter(User.id.in_(list(user_ids))).all() if user_ids else []
+    user_map = {u.id: u for u in users}
+
+    reactions_by_post = {}
+    for r in reactions:
+        if r.post_id not in reactions_by_post:
+            reactions_by_post[r.post_id] = []
+        reactions_by_post[r.post_id].append(r)
+
+    comments_by_post = {}
+    for c in comments:
+        if c.post_id not in comments_by_post:
+            comments_by_post[c.post_id] = []
+        comments_by_post[c.post_id].append(c)
+
+    reactions_by_comment = {}
+    for cr in comment_reactions:
+        if cr.comment_id not in reactions_by_comment:
+            reactions_by_comment[cr.comment_id] = []
+        reactions_by_comment[cr.comment_id].append(cr)
+
+    posts = []
+    for p in posts_query:
+        post_reactions = reactions_by_post.get(p.id, [])
+        post_comments_query = comments_by_post.get(p.id, [])
+        
+        structured_comments = []
+        for c in post_comments_query:
+            comment_reacts = reactions_by_comment.get(c.id, [])
+            structured_comments.append({
+                'obj': c,
+                'user': user_map.get(c.user_id),
+                'reactions': comment_reacts
+            })
+
+        posts.append({
+            'obj': p,
+            'user': user_map.get(p.user_id),
+            'reactions': post_reactions,
+            'comments': structured_comments
+        })
+
     subs_map = {}
     if membership.role == 'student' and assignments:
         aid_list = [a.id for a in assignments]
         subs = AssignmentSubmission.query.filter(AssignmentSubmission.assignment_id.in_(aid_list), AssignmentSubmission.user_id == user.id).all()
         subs_map = {s.assignment_id: s for s in subs}
-        # Due soon notifications (within 24h, not submitted)
         try:
             existing_due_notifs = Notification.query.filter_by(user_id=user.id, type='due_soon').all()
             existing_ids = set()
             for n in existing_due_notifs:
                 if n.payload_json:
                     try:
-                        p = json.loads(n.payload_json)
-                        if isinstance(p, dict) and 'assignment_id' in p:
-                            existing_ids.add(int(p['assignment_id']))
+                        payload = json.loads(n.payload_json)
+                        if isinstance(payload, dict) and 'assignment_id' in payload:
+                            existing_ids.add(int(payload['assignment_id']))
                     except Exception:
                         pass
             for a in assignments:
@@ -725,7 +793,71 @@ def classroom_view(class_id):
         except Exception as e:
             app.logger.error(f'Failed generating due reminders: {e}')
 
-    return render_template('classroom.html', classroom=classroom, posts=posts, assignments=assignments, is_teacher=is_teacher, now=now, subs_map=subs_map)
+    return render_template('classroom.html', classroom=classroom, posts=posts, assignments=assignments, is_teacher=is_teacher, now=now, subs_map=subs_map, user_map=user_map, current_user=user)
+
+
+@app.route('/classroom/<int:class_id>/post/<int:post_id>/react', methods=['POST'])
+@login_required
+def react_to_post(class_id, post_id):
+    classroom, membership, redirect_resp = require_membership(class_id)
+    if redirect_resp:
+        return redirect_resp
+    
+    user = get_current_user()
+    reaction_type = request.form.get('reaction_type')
+    
+    if not reaction_type:
+        flash('Reaction type is required.', 'warning')
+        return redirect(url_for('classroom_view', class_id=class_id))
+
+    post = ClassPost.query.get_or_404(post_id)
+    if post.classroom_id != class_id:
+        flash('Invalid post.', 'danger')
+        return redirect(url_for('classroom_view', class_id=class_id))
+
+    existing_reaction = PostReaction.query.filter_by(post_id=post_id, user_id=user.id).first()
+    
+    if existing_reaction:
+        if existing_reaction.reaction_type == reaction_type:
+            db.session.delete(existing_reaction)
+            flash('Reaction removed.', 'info')
+        else:
+            existing_reaction.reaction_type = reaction_type
+            flash('Reaction updated.', 'success')
+    else:
+        new_reaction = PostReaction(post_id=post_id, user_id=user.id, reaction_type=reaction_type)
+        db.session.add(new_reaction)
+        flash('Reaction added.', 'success')
+        
+    db.session.commit()
+    return redirect(url_for('classroom_view', class_id=class_id))
+
+
+@app.route('/classroom/<int:class_id>/post/<int:post_id>/comment', methods=['POST'])
+@login_required
+def comment_on_post(class_id, post_id):
+    classroom, membership, redirect_resp = require_membership(class_id)
+    if redirect_resp:
+        return redirect_resp
+
+    user = get_current_user()
+    content = request.form.get('content', '').strip()
+
+    if not content:
+        flash('Comment cannot be empty.', 'warning')
+        return redirect(url_for('classroom_view', class_id=class_id))
+
+    post = ClassPost.query.get_or_404(post_id)
+    if post.classroom_id != class_id:
+        flash('Invalid post.', 'danger')
+        return redirect(url_for('classroom_view', class_id=class_id))
+
+    new_comment = PostComment(post_id=post_id, user_id=user.id, content=content)
+    db.session.add(new_comment)
+    db.session.commit()
+    
+    flash('Comment added.', 'success')
+    return redirect(url_for('classroom_view', class_id=class_id))
 
 
 @app.route('/classroom/<int:class_id>/post', methods=['POST'])
@@ -865,7 +997,7 @@ def start_assignment(class_id, assignment_id):
     assignment = Assignment.query.filter_by(id=assignment_id, classroom_id=class_id).first_or_404()
 
     # Enforce open/close windows
-    now = datetime.utcnow()
+    now = datetime.now()
     if assignment.opens_at and now < assignment.opens_at:
         flash('This assignment is not open yet.', 'warning')
         return redirect(url_for('classroom_view', class_id=class_id))
@@ -1090,5 +1222,4 @@ if __name__ == '__main__':
         ensure_submission_is_late_column()
         db.create_all()
     app.run(debug=True)
-
 
