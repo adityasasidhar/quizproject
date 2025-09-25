@@ -62,7 +62,7 @@ def generate_school_quiz(subject: str, grade: str, board: str, chapters: List[st
         content = [prompt,
                    f"You are generating a school quiz for {subject.upper()} grade {grade.upper()} board {board.upper()}"]
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+        context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
         uploaded_files = []
         for chapter in chapters:
             pdf_path = os.path.join(context_dir, chapter)
@@ -102,7 +102,7 @@ def generate_school_test(subject: str, grade: str, board: str, chapters: List[st
         content = [prompt,
                    f"You are generating a school test for {subject.upper()} grade {grade.upper()} board {board.upper()}"]
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        context_dir = os.path.join(base_dir, "..", "CONTEXT", "BOOKS", board, grade, language, subject)
+        context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
         uploaded_files = []
         for chapter in chapters:
             pdf_path = os.path.join(context_dir, chapter)
