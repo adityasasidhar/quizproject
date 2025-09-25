@@ -9,6 +9,38 @@
     <a href="#exam-categories" class="btn btn-primary btn-lg mt-3">Explore Exams</a>
 </div>
 
+<div class="container my-5" id="classrooms-cta">
+    <h2 class="text-center mb-4 fw-bold">Classrooms</h2>
+    <div class="row g-4 align-items-stretch">
+        <div class="col-md-6">
+            <div class="card h-100 text-center shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title fw-bold">Your Classrooms</h5>
+                    <p class="text-muted">View and manage classes you have joined or created.</p>
+                    <a href="{{ url_for('classrooms') }}" class="btn btn-primary mt-auto">Go to Classrooms</a>
+                </div>
+            </div>
+        </div>
+        {% if session.role == 'student' %}
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3"><i class="fas fa-sign-in-alt me-2"></i>Join a Classroom</h5>
+                    <form method="post" action="{{ url_for('join_classroom') }}">
+                        <div class="input-group">
+                            <input type="text" name="code" class="form-control" placeholder="Enter class code" required>
+                            <button type="submit" class="btn btn-success">Join</button>
+                        </div>
+                        <div class="form-text mt-2">Ask your teacher for the class code.</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 <div class="container" id="exam-categories">
     <h2 class="text-center mb-5 fw-bold">Choose Your Exam Category</h2>
 

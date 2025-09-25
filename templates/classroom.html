@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}{{ classroom.name }} - Class{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">{{ classroom.name }}</h2>
+    <small class="text-muted">Class code: <span class="badge bg-secondary">{{ classroom.code }}</span></small>
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-outline-secondary" href="{{ url_for('classrooms') }}">Back to Classrooms</a>
+    {% if is_teacher %}
+    <a class="btn btn-primary" href="{{ url_for('classroom_students', class_id=classroom.id) }}">Students &amp; Grades</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Class Stream</h5>
+        {% if is_teacher %}
+        <form method="post" action="{{ url_for('classroom_post', class_id=classroom.id) }}" enctype="multipart/form-data">
+          <div class="mb-2">
+            <textarea name="content" class="form-control" rows="2" placeholder="Share something with your class..."></textarea>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <select name="post_type" class="form-select" style="max-width: 180px;">
+              <option value="post">Post</option>
+              <option value="chat">Chat</option>
+            </select>
+            <input type="file" name="material_file" class="form-control" style="max-width: 320px;" />
+            <button class="btn btn-primary" type="submit">Share</button>
+          </div>
+          <small class="text-muted">Attach materials as PDF or images. Selecting a file will mark it as material.</small>
+        </form>
+        {% else %}
+        <div class="alert alert-info mb-0">
+          Only teachers can post to the class stream. You can comment or react on posts and complete assignments.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% for p in posts %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <span class="badge {% if p.post_type == 'material' %}bg-success{% elif p.post_type == 'chat' %}bg-info{% else %}bg-primary{% endif %}">{{ p.post_type|capitalize }}</span>
+              <small class="text-muted ms-2">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+          </div>
+          {% if p.content %}
+            <p class="mt-2 mb-1">{{ p.content }}</p>
+          {% endif %}
+          {% if p.attachment_path %}
+            <a class="btn btn-sm btn-outline-secondary" href="{{ p.attachment_path }}" target="_blank">
+              View attachment
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title d-flex justify-content-between align-items-center">
+          <span>Assignments</span>
+        </h5>
+        {% if assignments %}
+          <ul class="list-group list-group-flush">
+            {% for a in assignments %}
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-bold">{{ a.title }}</div>
+                    <small class="text-muted">{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                  </div>
+                  <div class="btn-group">
+                    <a class="btn btn-sm btn-primary" href="{{ url_for('start_assignment', class_id=classroom.id, assignment_id=a.id) }}">Start</a>
+                    {% if is_teacher %}
+                      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('view_submissions', class_id=classroom.id, assignment_id=a.id) }}">Submissions</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="alert alert-info mb-0">No assignments yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if is_teacher %}
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Create Assignment</h5>
+        <form method="post" action="{{ url_for('create_assignment', class_id=classroom.id) }}">
+          <div class="mb-2">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Exam Type</label>
+            <select name="exam_name" class="form-select" id="examTypeSelect">
+              <option value="JEE_MAINS">JEE Mains</option>
+              <option value="JEE_ADVANCED">JEE Advanced</option>
+              <option value="NEET_UG">NEET UG</option>
+              <option value="SCHOOL">School</option>
+            </select>
+          </div>
+          <div id="nonSchoolConfig">
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">Difficulty</label>
+                <select name="difficulty" class="form-select">
+                  <option value="EASY">Easy</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HARD">Hard</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Format</label>
+                <select name="exam_format" class="form-select">
+                  <option value="MCQ">MCQ</option>
+                  <option value="SUBJECTIVE">Subjective</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="schoolConfig" style="display:none;">
+            <div class="mb-2">
+              <label class="form-label">School Exam Type</label>
+              <select name="school_exam_type" class="form-select">
+                <option value="SCHOOL_TEST">School Test</option>
+                <option value="SCHOOL_QUIZ">School Quiz</option>
+              </select>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">Subject</label>
+                <input type="text" name="subject" class="form-control" placeholder="Physics">
+              </div>
+              <div class="col-3">
+                <label class="form-label">Grade</label>
+                <input type="text" name="grade" class="form-control" placeholder="9">
+              </div>
+              <div class="col-3">
+                <label class="form-label">Board</label>
+                <input type="text" name="board" class="form-control" placeholder="TSBIE">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Chapters (comma-separated)</label>
+              <input type="text" name="chapters" class="form-control" placeholder="Motion, Matter around us">
+            </div>
+          </div>
+          <button class="btn btn-success w-100" type="submit">Create Assignment</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const examTypeSelect = document.getElementById('examTypeSelect');
+  const schoolConfig = document.getElementById('schoolConfig');
+  const nonSchoolConfig = document.getElementById('nonSchoolConfig');
+  function toggleConfig(){
+    if (!examTypeSelect) return;
+    if (examTypeSelect.value === 'SCHOOL') { schoolConfig.style.display='block'; nonSchoolConfig.style.display='none'; }
+    else { schoolConfig.style.display='none'; nonSchoolConfig.style.display='block'; }
+  }
+  if (examTypeSelect){ examTypeSelect.addEventListener('change', toggleConfig); toggleConfig(); }
+</script>
+{% endblock %}

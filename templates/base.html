@@ -24,18 +24,36 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('classrooms') }}">Classrooms</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if session.username %}
+                    {% if session.role == 'teacher' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.username }})</a>
+                        <a class="nav-link" href="{{ url_for('teacher_portal') }}">Teacher Portal</a>
+                    </li>
+                    {% elif session.role == 'student' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('student_portal') }}">Student Portal</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.username }}{% if session.role %} - {{ session.role|capitalize }}{% endif %})</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('login_role', role='teacher') }}">Teacher Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
+                        <a class="nav-link" href="{{ url_for('login_role', role='student') }}">Student Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('signup_role', role='teacher') }}">Teacher Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('signup_role', role='student') }}">Student Sign Up</a>
                     </li>
                     {% endif %}
                 </ul>

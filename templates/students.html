@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Students & Grades - {{ classroom.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">Students & Grades</h2>
+    <small class="text-muted">Class: {{ classroom.name }}</small>
+  </div>
+  <a class="btn btn-secondary" href="{{ url_for('classroom_view', class_id=classroom.id) }}">Back to Classroom</a>
+</div>
+
+{% if students %}
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th class="text-center">Submissions</th>
+        <th class="text-center">Missing</th>
+        <th class="text-center">Average %</th>
+        <th class="text-center">Last Submitted</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td class="fw-semibold">{{ s.username }}</td>
+        <td class="text-center">{{ s.submissions_count }}</td>
+        <td class="text-center">{{ s.missing_count }}</td>
+        <td class="text-center">{% if s.avg_percentage is not none %}{{ '%.1f'|format(s.avg_percentage) }}%{% else %}<span class="text-muted">—</span>{% endif %}</td>
+        <td class="text-center">{% if s.last_submitted_at %}{{ s.last_submitted_at.strftime('%Y-%m-%d %H:%M') }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+        <td class="text-end"><a class="btn btn-sm btn-primary" href="{{ url_for('student_report', class_id=classroom.id, student_id=s.id) }}">View Report</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">No students have joined this classroom yet.</div>
+{% endif %}
+
+{% endblock %}
