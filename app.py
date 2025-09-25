@@ -249,13 +249,27 @@ def submit_exam():
     if assignment_id:
         try:
             user = get_current_user()
+            assignment = Assignment.query.get(assignment_id)
+            now = datetime.utcnow()
+            # Enforce opens/due at submission
+            if assignment:
+                if assignment.opens_at and now < assignment.opens_at:
+                    session.pop('assignment_id', None)
+                    flash('This assignment is not open yet.', 'warning')
+                    return redirect(url_for('classroom_view', class_id=assignment.classroom_id))
+                if assignment.due_at and now > assignment.due_at and (assignment.late_policy or 'allow') == 'block':
+                    session.pop('assignment_id', None)
+                    flash('This assignment is closed. Submission not accepted.', 'danger')
+                    return redirect(url_for('classroom_view', class_id=assignment.classroom_id))
             details = {'results': results}
             existing = AssignmentSubmission.query.filter_by(assignment_id=assignment_id, user_id=user.id).first()
+            is_late = bool(assignment and assignment.due_at and now > assignment.due_at and (assignment.late_policy or 'allow') != 'block')
             if existing:
                 existing.score = score
                 existing.total = total
                 existing.percentage = percentage
                 existing.details_json = json.dumps(details)
+                existing.is_late = is_late
                 existing.submitted_at = datetime.utcnow()
             else:
                 sub = AssignmentSubmission(
@@ -264,7 +278,8 @@ def submit_exam():
                     score=score,
                     total=total,
                     percentage=percentage,
-                    details_json=json.dumps(details)
+                    details_json=json.dumps(details),
+                    is_late=is_late
                 )
                 db.session.add(sub)
             db.session.commit()
@@ -478,6 +493,9 @@ class Assignment(db.Model):
     json_path = db.Column(db.String(255), nullable=False)
     config_json = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    opens_at = db.Column(db.DateTime, nullable=True)
+    due_at = db.Column(db.DateTime, nullable=True)
+    late_policy = db.Column(db.String(20), nullable=False, default='allow')  # 'allow' or 'block'
 
 
 class AssignmentSubmission(db.Model):
@@ -488,9 +506,18 @@ class AssignmentSubmission(db.Model):
     total = db.Column(db.Integer, nullable=False)
     percentage = db.Column(db.Float, nullable=False)
     details_json = db.Column(db.Text, nullable=True)
+    is_late = db.Column(db.Boolean, nullable=False, default=False)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (db.UniqueConstraint('assignment_id', 'user_id', name='uq_assignment_user'),)
 
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    payload_json = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read_at = db.Column(db.DateTime, nullable=True)
 
 # Helper utilities
 
@@ -512,6 +539,59 @@ def require_membership(classroom_id):
         return None, None, redirect(url_for('classrooms'))
     return classroom, membership, None
 
+
+# ----------------------
+# In-app notifications utilities & routes
+# ----------------------
+
+@app.context_processor
+def inject_unread_notifications():
+    try:
+        user = get_current_user()
+        if not user:
+            return dict(unread_notifications=0)
+        count = Notification.query.filter_by(user_id=user.id, read_at=None).count()
+        return dict(unread_notifications=count)
+    except Exception:
+        return dict(unread_notifications=0)
+
+@app.route('/notifications')
+@login_required
+def notifications_page():
+    user = get_current_user()
+    notifs = Notification.query.filter_by(user_id=user.id).order_by(Notification.created_at.desc()).all()
+    # Attempt to parse payload for convenience
+    parsed = []
+    for n in notifs:
+        payload = None
+        if n.payload_json:
+            try:
+                payload = json.loads(n.payload_json)
+            except Exception:
+                payload = None
+        parsed.append({'obj': n, 'payload': payload})
+    return render_template('notifications.html', notifications=parsed)
+
+@app.route('/notifications/<int:notif_id>/read')
+@login_required
+def mark_notification_read(notif_id):
+    user = get_current_user()
+    n = Notification.query.get_or_404(notif_id)
+    if n.user_id != user.id:
+        flash('Not authorized to modify this notification.', 'danger')
+        return redirect(url_for('notifications_page'))
+    if not n.read_at:
+        n.read_at = datetime.utcnow()
+        db.session.commit()
+    return redirect(url_for('notifications_page'))
+
+@app.route('/notifications/mark_all_read')
+@login_required
+def mark_all_notifications_read():
+    user = get_current_user()
+    Notification.query.filter_by(user_id=user.id, read_at=None).update({'read_at': datetime.utcnow()})
+    db.session.commit()
+    return redirect(url_for('notifications_page'))
 
 # ----------------------
 # Role-specific portals
@@ -616,7 +696,36 @@ def classroom_view(class_id):
     posts = ClassPost.query.filter_by(classroom_id=classroom.id).order_by(ClassPost.created_at.desc()).all()
     assignments = Assignment.query.filter_by(classroom_id=classroom.id).order_by(Assignment.created_at.desc()).all()
     is_teacher = membership.role == 'teacher'
-    return render_template('classroom.html', classroom=classroom, posts=posts, assignments=assignments, is_teacher=is_teacher)
+
+    # Build student submissions map and generate due reminders
+    user = get_current_user()
+    now = datetime.utcnow()
+    subs_map = {}
+    if membership.role == 'student' and assignments:
+        aid_list = [a.id for a in assignments]
+        subs = AssignmentSubmission.query.filter(AssignmentSubmission.assignment_id.in_(aid_list), AssignmentSubmission.user_id == user.id).all()
+        subs_map = {s.assignment_id: s for s in subs}
+        # Due soon notifications (within 24h, not submitted)
+        try:
+            existing_due_notifs = Notification.query.filter_by(user_id=user.id, type='due_soon').all()
+            existing_ids = set()
+            for n in existing_due_notifs:
+                if n.payload_json:
+                    try:
+                        p = json.loads(n.payload_json)
+                        if isinstance(p, dict) and 'assignment_id' in p:
+                            existing_ids.add(int(p['assignment_id']))
+                    except Exception:
+                        pass
+            for a in assignments:
+                if a.due_at and now < a.due_at and (a.due_at - now).total_seconds() <= 24*3600 and a.id not in subs_map and a.id not in existing_ids:
+                    payload = {'class_id': class_id, 'assignment_id': a.id, 'title': a.title, 'due_at': a.due_at.isoformat()}
+                    db.session.add(Notification(user_id=user.id, type='due_soon', payload_json=json.dumps(payload)))
+            db.session.commit()
+        except Exception as e:
+            app.logger.error(f'Failed generating due reminders: {e}')
+
+    return render_template('classroom.html', classroom=classroom, posts=posts, assignments=assignments, is_teacher=is_teacher, now=now, subs_map=subs_map)
 
 
 @app.route('/classroom/<int:class_id>/post', methods=['POST'])
@@ -712,9 +821,37 @@ def create_assignment(class_id):
     if not json_path:
         flash('Failed to generate paper for assignment.', 'danger')
         return redirect(url_for('classroom_view', class_id=class_id))
-    assignment = Assignment(classroom_id=class_id, title=title, description=description, json_path=json_path, config_json=json.dumps(config))
+    # Deadlines
+    opens_at_str = request.form.get('opens_at', '').strip()
+    due_at_str = request.form.get('due_at', '').strip()
+    late_policy = (request.form.get('late_policy') or 'allow').strip().lower()
+    def parse_dt(val):
+        try:
+            return datetime.strptime(val, '%Y-%m-%dT%H:%M') if val else None
+        except Exception:
+            return None
+    opens_at = parse_dt(opens_at_str)
+    due_at = parse_dt(due_at_str)
+
+    assignment = Assignment(classroom_id=class_id, title=title, description=description, json_path=json_path, config_json=json.dumps(config), opens_at=opens_at, due_at=due_at, late_policy=late_policy)
     db.session.add(assignment)
     db.session.commit()
+
+    # Notify students about new assignment
+    try:
+        student_mems = ClassroomMembership.query.filter_by(classroom_id=class_id, role='student').all()
+        payload = {
+            'class_id': class_id,
+            'assignment_id': assignment.id,
+            'title': title,
+            'due_at': due_at.isoformat() if due_at else None
+        }
+        for m in student_mems:
+            db.session.add(Notification(user_id=m.user_id, type='assignment_created', payload_json=json.dumps(payload)))
+        db.session.commit()
+    except Exception as e:
+        app.logger.error(f'Failed to create assignment notifications: {e}')
+
     flash('Assignment created successfully.', 'success')
     return redirect(url_for('classroom_view', class_id=class_id))
 
@@ -726,9 +863,20 @@ def start_assignment(class_id, assignment_id):
     if redirect_resp:
         return redirect_resp
     assignment = Assignment.query.filter_by(id=assignment_id, classroom_id=class_id).first_or_404()
+
+    # Enforce open/close windows
+    now = datetime.utcnow()
+    if assignment.opens_at and now < assignment.opens_at:
+        flash('This assignment is not open yet.', 'warning')
+        return redirect(url_for('classroom_view', class_id=class_id))
+    if assignment.due_at and now > assignment.due_at and (assignment.late_policy or 'allow') == 'block':
+        flash('This assignment is closed.', 'warning')
+        return redirect(url_for('classroom_view', class_id=class_id))
+
     session['json_path'] = assignment.json_path
     session['assignment_id'] = assignment.id
     session['answers_uploaded'] = False
+    session['late_start'] = bool(assignment.due_at and now > assignment.due_at and (assignment.late_policy or 'allow') != 'block')
     return redirect(url_for('online_exam'))
 
 
@@ -903,11 +1051,43 @@ def ensure_user_role_column():
     except Exception as e:
         app.logger.error(f"Failed to ensure role column on user table: {e}")
 
+def ensure_assignment_deadline_columns():
+    try:
+        tbl = db.session.execute(db.text("SELECT name FROM sqlite_master WHERE type='table' AND name='assignment'"))
+        if not tbl.fetchone():
+            return
+        res = db.session.execute(db.text("PRAGMA table_info(assignment)"))
+        cols = [row[1] for row in res]
+        if 'opens_at' not in cols:
+            db.session.execute(db.text("ALTER TABLE assignment ADD COLUMN opens_at DATETIME"))
+        if 'due_at' not in cols:
+            db.session.execute(db.text("ALTER TABLE assignment ADD COLUMN due_at DATETIME"))
+        if 'late_policy' not in cols:
+            db.session.execute(db.text("ALTER TABLE assignment ADD COLUMN late_policy VARCHAR(20) NOT NULL DEFAULT 'allow'"))
+        db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Failed to ensure assignment deadline columns: {e}")
+
+def ensure_submission_is_late_column():
+    try:
+        tbl = db.session.execute(db.text("SELECT name FROM sqlite_master WHERE type='table' AND name='assignment_submission'"))
+        if not tbl.fetchone():
+            return
+        res = db.session.execute(db.text("PRAGMA table_info(assignment_submission)"))
+        cols = [row[1] for row in res]
+        if 'is_late' not in cols:
+            db.session.execute(db.text("ALTER TABLE assignment_submission ADD COLUMN is_late BOOLEAN NOT NULL DEFAULT 0"))
+            db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Failed to ensure is_late column: {e}")
+
 
 # Ensure tables are created on run
 if __name__ == '__main__':
     with app.app_context():
         ensure_user_role_column()
+        ensure_assignment_deadline_columns()
+        ensure_submission_is_late_column()
         db.create_all()
     app.run(debug=True)
 

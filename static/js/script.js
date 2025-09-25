@@ -3,16 +3,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Theme toggle switch
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', function() {
-        document.body.classList.toggle('dark-theme');
-        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    });
-    // Load theme from localStorage
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-theme');
-    }
     // Enable Bootstrap tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -57,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Auto-save answers for online exam (every 30 seconds)
+    const autosaveEl = document.getElementById('autosave-status');
     const saveAnswers = function() {
         if (!examForm) return;
         
@@ -68,7 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         localStorage.setItem('examAnswers', JSON.stringify(answers));
-        console.log('Answers auto-saved at', new Date().toLocaleTimeString());
+        const ts = new Date().toLocaleTimeString();
+        if (autosaveEl) {
+            autosaveEl.textContent = `Saved at ${ts}`;
+            autosaveEl.classList.remove('text-muted');
+            autosaveEl.classList.add('text-success');
+        }
+        console.log('Answers auto-saved at', ts);
     };
     
     // Load saved answers if available
@@ -96,6 +93,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            if (autosaveEl) {
+                autosaveEl.textContent = 'Restored saved answers';
+                autosaveEl.classList.add('text-info');
+            }
             console.log('Saved answers loaded');
         } catch (e) {
             console.error('Error loading saved answers:', e);
@@ -106,6 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (examForm) {
         loadSavedAnswers();
         setInterval(saveAnswers, 30000); // Save every 30 seconds
+        
+        // Save on change
+        examForm.addEventListener('input', function() {
+            if (autosaveEl) {
+                autosaveEl.textContent = 'Saving...';
+                autosaveEl.classList.remove('text-success','text-info');
+                autosaveEl.classList.add('text-muted');
+            }
+            saveAnswers();
+        });
         
         // Clear saved answers when form is submitted
         examForm.addEventListener('submit', function() {

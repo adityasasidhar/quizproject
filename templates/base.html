@@ -40,6 +40,14 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
+                        <a class="nav-link position-relative" href="{{ url_for('notifications_page') }}" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            {% if unread_notifications and unread_notifications > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.username }}{% if session.role %} - {{ session.role|capitalize }}{% endif %})</a>
                     </li>
                     {% else %}

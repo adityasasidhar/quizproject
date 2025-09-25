@@ -31,9 +31,10 @@
               <option value="post">Post</option>
               <option value="chat">Chat</option>
             </select>
-            <input type="file" name="material_file" class="form-control" style="max-width: 320px;" />
+            <input type="file" name="material_file" id="materialFile" class="form-control" style="max-width: 320px;" />
             <button class="btn btn-primary" type="submit">Share</button>
           </div>
+          <div id="fileHelp" class="form-text">Max 10MB. Allowed: PDF, JPG, JPEG, PNG.</div>
           <small class="text-muted">Attach materials as PDF or images. Selecting a file will mark it as material.</small>
         </form>
         {% else %}
@@ -57,9 +58,17 @@
             <p class="mt-2 mb-1">{{ p.content }}</p>
           {% endif %}
           {% if p.attachment_path %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ p.attachment_path }}" target="_blank">
-              View attachment
-            </a>
+            {% set ext = p.attachment_path.split('.')[-1].lower() %}
+            <div class="mt-2">
+              {% if ext == 'pdf' %}
+                <embed src="{{ p.attachment_path }}" type="application/pdf" width="100%" height="400px" class="rounded border" />
+              {% else %}
+                <img src="{{ p.attachment_path }}" alt="Attachment" class="img-fluid rounded border" style="max-height: 400px;" />
+              {% endif %}
+            </div>
+            <div class="mt-2">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ p.attachment_path }}" target="_blank">Open in new tab</a>
+            </div>
           {% endif %}
         </div>
       </div>
@@ -77,12 +86,39 @@
             {% for a in assignments %}
               <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
-                  <div>
+                  <div class="me-2">
                     <div class="fw-bold">{{ a.title }}</div>
-                    <small class="text-muted">{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    <small class="text-muted d-block">Created {{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    <div class="small mt-1">
+                      {% if a.opens_at %}<span class="text-muted me-2">Opens: {{ a.opens_at.strftime('%Y-%m-%d %H:%M') }}</span>{% endif %}
+                      {% if a.due_at %}<span class="text-muted">Due: {{ a.due_at.strftime('%Y-%m-%d %H:%M') }} <span class="due-countdown badge bg-dark ms-1" data-due="{{ a.due_at.isoformat() }}"></span></span>{% endif %}
+                    </div>
+                    <div class="mt-1">
+                      {% if a.due_at and now > a.due_at %}
+                        {% if a.late_policy == 'block' %}
+                          <span class="badge bg-secondary">Closed</span>
+                        {% else %}
+                          <span class="badge bg-warning text-dark">Late</span>
+                        {% endif %}
+                      {% elif a.opens_at and now < a.opens_at %}
+                        <span class="badge bg-info text-dark">Opens soon</span>
+                      {% elif a.due_at and (a.due_at - now).total_seconds() <= 86400 %}
+                        <span class="badge bg-danger">Due soon</span>
+                      {% else %}
+                        <span class="badge bg-success">Open</span>
+                      {% endif %}
+                      {% if not is_teacher and subs_map.get(a.id) %}
+                        {% if subs_map.get(a.id).is_late %}
+                          <span class="badge bg-warning text-dark ms-1">Submitted Late</span>
+                        {% else %}
+                          <span class="badge bg-primary ms-1">Submitted</span>
+                        {% endif %}
+                      {% endif %}
+                    </div>
                   </div>
-                  <div class="btn-group">
-                    <a class="btn btn-sm btn-primary" href="{{ url_for('start_assignment', class_id=classroom.id, assignment_id=a.id) }}">Start</a>
+                  <div class="btn-group align-self-start">
+                    {% set closed = a.due_at and now > a.due_at and a.late_policy == 'block' %}
+                    <a class="btn btn-sm btn-primary {{ 'disabled' if (a.opens_at and now < a.opens_at) or closed else '' }}" href="{{ url_for('start_assignment', class_id=classroom.id, assignment_id=a.id) }}">Start</a>
                     {% if is_teacher %}
                       <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('view_submissions', class_id=classroom.id, assignment_id=a.id) }}">Submissions</a>
                     {% endif %}
@@ -165,6 +201,21 @@
               <input type="text" name="chapters" class="form-control" placeholder="Motion, Matter around us">
             </div>
           </div>
+          <div class="mb-2">
+            <label class="form-label">Opens At</label>
+            <input type="datetime-local" name="opens_at" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Due At</label>
+            <input type="datetime-local" name="due_at" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Late Policy</label>
+            <select name="late_policy" class="form-select">
+              <option value="allow" selected>Allow late submissions</option>
+              <option value="block">Block after due</option>
+            </select>
+          </div>
           <button class="btn btn-success w-100" type="submit">Create Assignment</button>
         </form>
       </div>
@@ -185,5 +236,54 @@
     else { schoolConfig.style.display='none'; nonSchoolConfig.style.display='block'; }
   }
   if (examTypeSelect){ examTypeSelect.addEventListener('change', toggleConfig); toggleConfig(); }
+
+  // File validation for materials
+  const matInput = document.getElementById('materialFile');
+  if (matInput) {
+    matInput.addEventListener('change', () => {
+      const file = matInput.files && matInput.files[0];
+      if (!file) return;
+      const maxBytes = 10 * 1024 * 1024; // 10MB
+      const allowed = ['pdf','png','jpg','jpeg'];
+      const ext = file.name.split('.').pop().toLowerCase();
+      let msg = '';
+      if (!allowed.includes(ext)) {
+        msg = 'File type not allowed. Use PDF, JPG, JPEG, or PNG.';
+      } else if (file.size > maxBytes) {
+        msg = 'File too large. Max 10MB.';
+      }
+      const help = document.getElementById('fileHelp');
+      if (msg) {
+        alert(msg);
+        matInput.value = '';
+        if (help) help.textContent = msg;
+      } else if (help) {
+        help.textContent = `Selected: ${file.name} (${Math.round(file.size/1024)} KB)`;
+      }
+    });
+  }
+
+  // Due countdowns
+  function updateCountdowns(){
+    const nodes = document.querySelectorAll('.due-countdown');
+    const now = new Date().getTime();
+    nodes.forEach(el => {
+      const dueIso = el.getAttribute('data-due');
+      if (!dueIso) return;
+      const due = Date.parse(dueIso);
+      const diff = due - now;
+      if (isNaN(due)) { el.textContent=''; return; }
+      if (diff <= 0) { el.textContent = 'due'; return; }
+      const mins = Math.floor(diff/60000);
+      const days = Math.floor(mins / (60*24));
+      const hours = Math.floor((mins % (60*24)) / 60);
+      const m = mins % 60;
+      if (days > 0) el.textContent = `${days}d ${hours}h`;
+      else if (hours > 0) el.textContent = `${hours}h ${m}m`;
+      else el.textContent = `${m}m`;
+    });
+  }
+  updateCountdowns();
+  setInterval(updateCountdowns, 30000);
 </script>
 {% endblock %}
