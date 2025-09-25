@@ -36,7 +36,7 @@
                 <div class="small text-muted">
                   Title: <strong>{{ payload.get('title', '—') }}</strong>
                   {% if payload.get('due_at') %}
-                    • Due: {{ payload.get('due_at')|replace('T', ' ')[:16] }}
+                    • Due: {{ (payload.get('due_at')|replace('T', ' '))[:16] }}
                   {% endif %}
                 </div>
               {% elif obj.type == 'due_soon' %}
@@ -44,7 +44,7 @@
                 <div class="small text-muted">
                   <strong>{{ payload.get('title', '—') }}</strong>
                   {% if payload.get('due_at') %}
-                    • Due: {{ payload.get('due_at')|replace('T', ' ')[:16] }}
+                    • Due: {{ (payload.get('due_at')|replace('T', ' '))[:16] }}
                   {% endif %}
                 </div>
               {% else %}
