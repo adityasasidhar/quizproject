@@ -23,9 +23,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-api_key = os.getenv("GEMINI_API_KEY")
+def get_api_key():
+    # Prefer environment variable, otherwise read from `apikey.txt`
+    key = os.getenv("GEMINI_API_KEY")
+    if key:
+        return key.strip()
+    try:
+        with open('apikey.txt', 'r') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+
+api_key = get_api_key()
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY not set and `apikey.txt` not found")
 
 client = genai.Client(api_key=api_key)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 class User(db.Model):
@@ -126,13 +140,13 @@ def index():
     """Home page with options for different exam categories"""
     return render_template('index.html')
 
-@app.route('/exam_selection')
-@login_required
-def exam_selection():
-    exam_type = request.args.get('exam_type')
-    if not exam_type:
-        return redirect(url_for('index'))
-    return render_template('exam_selection.html', exam_type=exam_type)
+@app.route('/exam_selection/<exam_type>')
+def exam_selection(exam_type):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    book_structure = get_available_books()
+    return render_template('exam_selection.html', exam_type=exam_type, book_structure=book_structure)
 
 @app.route('/generate_exam', methods=['POST'])
 @login_required
@@ -146,24 +160,41 @@ def generate_exam():
         subject = request.form.get('subject')
         grade = request.form.get('grade')
         board = request.form.get('board')
-        chapters_str = request.form.get('chapters')
-        chapters = [c.strip() for c in chapters_str.split(',')] if chapters_str else []
+        language = request.form.get('language')
+        chapters = request.form.getlist('chapters')
+
+        # Infer exam mode for School exams
+        if school_exam_type == 'SCHOOL_QUIZ':
+            exam_mode = 'online'
+        else:
+            exam_mode = 'offline'
 
         json_path = generate_paper(
             name_of_the_exam=school_exam_type,
             subject=subject,
             grade=grade,
             board=board,
-            chapters=chapters
+            chapters=chapters,
+            language=language
         )
         session['exam_name'] = school_exam_type
         session['subject'] = subject
         session['grade'] = grade
         session['board'] = board
         session['chapters'] = chapters
+        session['language'] = language
     else:
         difficulty = request.form.get('difficulty')
-        exam_format = request.form.get('exam_format')
+        # For competitive exams, we now use exam_mode_selection to determine online/offline
+        exam_mode_selection = request.form.get('exam_mode_selection')
+        
+        # Default to MCQ for competitive exams
+        exam_format = 'MCQ'
+        
+        if exam_mode_selection == 'ONLINE':
+            exam_mode = 'online'
+        else:
+            exam_mode = 'offline'
 
         json_path = generate_paper(
             name_of_the_exam=exam_name, 
@@ -359,7 +390,7 @@ def download_answer_sheet():
 @app.route('/upload_answers', methods=['GET', 'POST'])
 @login_required
 def upload_answers():
-    """Handle upload of answer images and process them"""
+    """Handle upload of answer images/PDFs and process them with Gemini"""
     if request.method == 'POST':
         if 'answer_file' not in request.files:
             return render_template('upload_answers.html', error="No file part")
@@ -379,29 +410,48 @@ def upload_answers():
                 with open(json_path, 'r') as f:
                     questions = json.load(f)
                 
-                with open(filepath, "rb") as img_file:
-                    image_bytes = img_file.read()
-                
-                image_parts = [
-                    {
-                        "mime_type": f"image/{filepath.split('.')[-1]}",
-                        "data": base64.b64encode(image_bytes).decode('utf-8')
-                    }
-                ]
-                
+                # Prepare content for Gemini
                 prompt = f"""
-                I have an exam with the following questions:
+                I have an exam with the following questions and correct answers:
                 {json.dumps([{'question_number': q['question_number'], 'question': q['question'], 'answer': q['answer']} for q in questions], indent=2)}
-                The image contains handwritten or typed answers to these questions. 
-                Extract the answers from the image and match them to the questions.
+                
+                The attached file contains the student's handwritten or typed answers.
+                Your task is to:
+                1. Extract the student's answer for each question.
+                2. Compare it with the correct answer.
+                3. Determine if the answer is correct (or partially correct for subjective questions).
+                4. Assign a score (1 for correct, 0 for incorrect).
+                
                 Return a JSON array with the structure:
-                [ {{"question_number": 1, "extracted_answer": "...", "correct_answer": "...", "is_correct": true/false}} ]
-                If you can't find an answer, use an empty string for "extracted_answer" and set "is_correct" to false.
+                [ {{"question_number": 1, "extracted_answer": "...", "correct_answer": "...", "is_correct": true/false, "explanation": "..."}} ]
+                
+                If you can't find an answer for a question, mark it as incorrect.
                 """
                 
+                contents = [prompt]
+                
+                # Check file type and prepare accordingly
+                mime_type = mimetypes.guess_type(filepath)[0]
+                
+                if mime_type == 'application/pdf':
+                     # Upload PDF to Gemini
+                    uploaded_file = client.files.upload(file=filepath)
+                    contents.append(uploaded_file)
+                else:
+                    # Handle Image
+                    with open(filepath, "rb") as img_file:
+                        image_bytes = img_file.read()
+                    
+                    image_parts = {
+                        "mime_type": mime_type if mime_type else "image/jpeg",
+                        "data": base64.b64encode(image_bytes).decode('utf-8')
+                    }
+                    contents.append(image_parts)
+                
+                # Use a capable model
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash-lite",
-                    contents=[prompt, image_parts[0]],
+                    model="gemini-1.5-flash",
+                    contents=contents,
                 )
 
                 try:
@@ -417,7 +467,6 @@ def upload_answers():
                     total = len(results)
                     percentage = (score / total) * 100 if total > 0 else 0
 
-                    # Set session flag after successful upload
                     session['answers_uploaded'] = True
                     
                     return render_template('results.html', 
@@ -428,11 +477,11 @@ def upload_answers():
                                           is_uploaded=True)
                 except Exception as e:
                     return render_template('upload_answers.html', 
-                                          error=f"Error parsing Gemini response: {str(e)}",
+                                          error=f"Error parsing AI response: {str(e)}",
                                           response_text=response.text)
             
             except Exception as e:
-                return render_template('upload_answers.html', error=f"Error processing image: {str(e)}")
+                return render_template('upload_answers.html', error=f"Error processing file: {str(e)}")
             
             finally:
                 if os.path.exists(filepath):
@@ -442,7 +491,7 @@ def upload_answers():
         
         else:
             return render_template('upload_answers.html', 
-                                  error="File type not allowed. Please upload a JPG, JPEG, or PNG image.")
+                                  error="File type not allowed. Please upload a PDF, JPG, JPEG, or PNG.")
     
     return render_template('upload_answers.html')
 

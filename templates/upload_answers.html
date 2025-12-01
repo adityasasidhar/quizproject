@@ -12,15 +12,18 @@
         margin-bottom: 1.5rem;
         transition: all 0.3s;
     }
+
     .upload-area:hover {
         border-color: #0d6efd;
         background-color: #f8f9fa;
     }
+
     .upload-icon {
         font-size: 3rem;
         color: #6c757d;
         margin-bottom: 1rem;
     }
+
     #preview-image {
         max-width: 100%;
         max-height: 300px;
@@ -47,30 +50,40 @@
                     {% endif %}
                 </div>
                 {% endif %}
-                
+
                 <div class="alert alert-info">
                     <h4>Upload Your Answers</h4>
-                    <p>Please upload a photo or scan of your completed answer sheet. The system will analyze your answers and provide feedback.</p>
+                    <p>Please upload a photo or scan of your completed answer sheet. The system will analyze your
+                        answers and provide feedback.</p>
                     <ul>
                         <li>Make sure your handwriting is clear and legible</li>
                         <li>Ensure good lighting and image quality</li>
                         <li>Include the question number with each answer</li>
-                        <li>Supported formats: JPG, JPEG, PNG</li>
+                        <li>Supported formats: PDF, JPG, JPEG, PNG</li>
                     </ul>
                 </div>
-                
-                <form method="POST" action="{{ url_for('upload_answers') }}" enctype="multipart/form-data" id="upload-form">
+
+                <form method="POST" action="{{ url_for('upload_answers') }}" enctype="multipart/form-data"
+                    id="upload-form">
                     <div class="upload-area" id="drop-area">
                         <div class="upload-icon">
                             <i class="bi bi-cloud-arrow-up"></i>
                         </div>
                         <h4>Drag & Drop or Click to Upload</h4>
-                        <p class="text-muted">Upload a photo of your answer sheet</p>
-                        <input type="file" name="answer_file" id="answer-file" class="form-control" accept=".jpg,.jpeg,.png" style="display: none;">
+                        <p class="text-muted">Upload a photo or PDF of your answer sheet</p>
+                        <input type="file" name="answer_file" id="answer-file" class="form-control"
+                            accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
                         <button type="button" class="btn btn-outline-primary" id="select-file-btn">Select File</button>
-                        <img id="preview-image" src="#" alt="Preview">
+                        <div id="file-preview-container" style="display: none; margin-top: 1rem;">
+                            <img id="preview-image" src="#" alt="Preview"
+                                style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none;">
+                            <div id="file-info" class="mt-2">
+                                <i class="bi bi-file-earmark-text h2"></i>
+                                <p id="filename" class="mb-0 fw-bold"></p>
+                            </div>
+                        </div>
                     </div>
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg" id="submit-btn" disabled>
                             Submit for Evaluation
@@ -86,82 +99,95 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const dropArea = document.getElementById('drop-area');
         const fileInput = document.getElementById('answer-file');
         const selectBtn = document.getElementById('select-file-btn');
+        const previewContainer = document.getElementById('file-preview-container');
         const previewImage = document.getElementById('preview-image');
+        const fileInfo = document.getElementById('file-info');
+        const filenameDisplay = document.getElementById('filename');
         const submitBtn = document.getElementById('submit-btn');
-        
+
         // Open file dialog when the button or drop area is clicked
         selectBtn.addEventListener('click', () => fileInput.click());
         dropArea.addEventListener('click', (e) => {
-            if (e.target === dropArea) {
+            if (e.target === dropArea || e.target.closest('.upload-icon') || e.target.tagName === 'H4' || e.target.tagName === 'P') {
                 fileInput.click();
             }
         });
-        
+
         // Handle file selection
         fileInput.addEventListener('change', handleFileSelect);
-        
+
         // Handle drag and drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
         });
-        
+
         ['dragenter', 'dragover'].forEach(eventName => {
             dropArea.addEventListener(eventName, highlight, false);
         });
-        
+
         ['dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, unhighlight, false);
         });
-        
+
         dropArea.addEventListener('drop', handleDrop, false);
-        
+
         function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
+
         function highlight() {
             dropArea.style.borderColor = '#0d6efd';
             dropArea.style.backgroundColor = '#f8f9fa';
         }
-        
+
         function unhighlight() {
             dropArea.style.borderColor = '#ccc';
             dropArea.style.backgroundColor = '';
         }
-        
+
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
-            
+
             if (files.length) {
                 fileInput.files = files;
                 handleFileSelect();
             }
         }
-        
+
         function handleFileSelect() {
             if (fileInput.files.length) {
                 const file = fileInput.files[0];
-                
-                // Check if file is an image
-                if (!file.type.match('image.*')) {
-                    alert('Please select an image file (JPG, JPEG, or PNG).');
+
+                // Check if file is supported
+                if (!file.type.match('image.*') && file.type !== 'application/pdf') {
+                    alert('Please select a supported file (PDF, JPG, JPEG, or PNG).');
                     return;
                 }
-                
-                // Display preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = 'block';
-                    submitBtn.disabled = false;
+
+                previewContainer.style.display = 'block';
+                submitBtn.disabled = false;
+                filenameDisplay.textContent = file.name;
+
+                if (file.type.match('image.*')) {
+                    // Display image preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        fileInfo.style.display = 'none';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    // Display file info for PDF
+                    previewImage.style.display = 'none';
+                    fileInfo.style.display = 'block';
                 }
-                reader.readAsDataURL(file);
             }
         }
     });

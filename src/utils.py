@@ -32,6 +32,302 @@ def load_papers(directory: str) -> List[str]:
         print(f"Error loading papers: {e}")
         return []
 
+BOOK_MAPPINGS = {
+    "TSBIE": {
+        "6": {
+            "ENG": {
+                "MATHEMATICS": {
+                    "filename": "6th class maths em.pdf",
+                    "chapters": [
+                        "Knowing Our Numbers", "Whole Numbers", "Playing with Numbers", 
+                        "Basic Geometrical Ideas", "Measures of Lines and Angles", "Integers", 
+                        "Fractions and Decimals", "Data Handling", "Introduction to Algebra", 
+                        "Perimeter and Area", "Ratio and Proportion", "Symmetry", 
+                        "Practical Geometry", "Understanding 2D and 3D Shapes"
+                    ]
+                },
+                "SCIENCE": {
+                    "filename": "6th class gs em.pdf",
+                    "chapters": [
+                        "Our Food", "Playing with Magnets", "Rain: Where Does It Come From?", 
+                        "What Do Animals Eat?", "Materials and Things", "Habitat", 
+                        "Separation of Substances", "Fibre to Fabric", "Plants: Parts and Functions", 
+                        "Changes Around Us", "Water in Our Life", "Simple Electric Circuits", 
+                        "Learning How to Measure", "Movements in Animals", "Light, Shadows and Images", 
+                        "Living and Nonliving"
+                    ]
+                },
+                "SOCIAL": {
+                    "filename": "6th social em.pdf",
+                    "chapters": [
+                        "Reading and Making Maps", "Globe – A Model of the Earth", 
+                        "Land Forms – Penamakuru", "Dokur Village on the Plateau", 
+                        "Penugolu – A Tribal Village", "From Gathering Food to Growing Food", 
+                        "Agriculture in Our Times", "Trade in Agricultural Produce", 
+                        "Community Decision Making in a Tribe", "Emergence of Kingdoms and Republics", 
+                        "First Empires", "Democratic Government", "Village Panchayats", 
+                        "Local Self – Government in Urban Areas", "Diversity in Our Society", 
+                        "Towards Gender Equality", "Religion and Society in Early Times", 
+                        "Devotion and Love towards God", "Language, Writing and Great Books", 
+                        "Sculptures and Buildings", "Greenery in Telangana"
+                    ]
+                },
+                "ENGLISH": {
+                    "filename": "6th class english.pdf",
+                    "chapters": [
+                        "Peace and Harmony", "Telangana The Pride of the People", 
+                        "What Can a Dollar and Eleven Cents Do?", "An Adventure", 
+                        "Plant a Tree", "Rip Van Winkle", "P.T. Usha the Golden Girl", 
+                        "Half the Price"
+                    ]
+                }
+            },
+            "TEL": {
+                "TELUGU": {
+                    "filename": "6th class telugu fl.pdf",
+                    "chapters": [
+                        "Abhinandana", "Snehabandham", "Varsham", "Lekha", "Shataka Sudha", 
+                        "Pothana Balyam", "Udyama Spoorthi", "Chelimi", "Mamidi Chettu", 
+                        "Ramzan", "Balanagamma", "Trijata Swapnam"
+                    ]
+                }
+            },
+            "HIN": {
+                "HINDI": {
+                    "filename": "6th hindi fl.pdf",
+                    "chapters": [
+                        "Aam Le Lo Aam!", "Hamara Gaon", "Railway Station", "Bazaar", 
+                        "Mera Parivar", "Chidiyaghar", "Maidaan", "Baal Diwas", 
+                        "Khushiyon Ki Duniya", "Hind Desh Ke Niwasi", "Udyan", 
+                        "Bachche Chale Cricket Khelne", "Ye Path Kewal Padhne Ke Liye Hai", 
+                        "Shabdkosh"
+                    ]
+                }
+            }
+        },
+        "7": {
+            "ENG": {
+                "MATHEMATICS": {
+                    "filename": "7th class maths em.pdf",
+                    "chapters": [
+                        "Integers", "Fractions, Decimals and Rational Numbers", "Simple Equations", 
+                        "Lines and Angles", "Triangle and Its Properties", "Ratio - Applications", 
+                        "Data Handling", "Congruency of Triangles", "Construction of Triangles", 
+                        "Algebraic Expressions", "Powers and Exponents", "Quadrilaterals", 
+                        "Area and Perimeter", "Understanding 3D and 2D Shapes", "Symmetry"
+                    ]
+                },
+                "SCIENCE": {
+                    "filename": "7th class gs em.pdf",
+                    "chapters": [
+                        "Food Components", "Acids and Bases", "Animal Fibre", "Motion and Time", 
+                        "Heat - Measurement", "Weather and Climate", "Electricity", 
+                        "Air, Winds and Cyclones", "Reflection of Light", "Nutrition in Plants", 
+                        "Respiration in Organisms", "Reproduction in Plants", "Seed Dispersal", 
+                        "Water", "Soil: Our Life", "Forest: Our Life", "Changes Around Us"
+                    ]
+                },
+                "SOCIAL": {
+                    "filename": "7th social em.pdf",
+                    "chapters": [
+                        "Reading Maps of Different Kinds", "Rain and Rivers", "Tanks and Ground Water", 
+                        "Oceans and Fishing", "Europe", "Africa", "Handicrafts and Handlooms", 
+                        "Industrial Revolution", "Production in a Factory - A Paper Mill", 
+                        "Importance of Transport System", "New Kings and Kingdoms", 
+                        "The Kakatiyas - Emergence of a Regional Kingdom", "The Kings of Vijayanagara", 
+                        "Mughal Empire", "Establishment of British Empire in India", 
+                        "Making of Laws in the State Assembly", "Implementation of Laws in the District", 
+                        "Caste Discrimination and the Struggle for Equality", 
+                        "Livelihood and Struggles of Urban Workers", "Folk - Religion", 
+                        "Devotional Paths to the Divine", "Rulers and Buildings"
+                    ]
+                },
+                "ENGLISH": {
+                    "filename": "7th class english.pdf",
+                    "chapters": [
+                        "The Town Mouse and the Country Mouse", "C.V.Raman, the Pride of India", 
+                        "Puru, the Brave", "Tenali Paints a Horse", "A Trip to Andaman", 
+                        "A Hero", "The Wonderful World of Chess", "Snakes in India"
+                    ]
+                }
+            }
+        },
+        "8": {
+            "ENG": {
+                "MATHEMATICS": {
+                    "filename": "8EM_MAT.pdf",
+                    "chapters": [
+                        "Rational Numbers", "Linear Equations in One Variable", "Construction of Quadrilaterals", 
+                        "Exponents and Powers", "Comparing Quantities using Proportion", 
+                        "Square Roots and Cube Roots", "Frequency Distribution Tables and Graphs", 
+                        "Exploring Geometrical Figures", "Area of Plane Figures", 
+                        "Direct and Inverse Proportions", "Algebraic Expressions", "Factorisation", 
+                        "Visualizing 3-D in 2-D", "Surface Areas and Volumes", "Playing with Numbers"
+                    ]
+                },
+                "PHYSICS": {
+                    "filename": "8EM_PHY.pdf",
+                    "chapters": [
+                        "Force", "Friction", "Synthetic Fibres and Plastics", "Metals and Non-metals", 
+                        "Sound", "Reflection of Light at Plane Surface", "Coal and Petroleum", 
+                        "Combustion, Fuels and Flame", "Electrical Conductivity of Liquids", 
+                        "Some Natural Phenomena", "Stars and the Solar System", "Graphs of Motion"
+                    ]
+                },
+                "BIOLOGY": {
+                    "filename": "8EM_BIO.pdf",
+                    "chapters": [
+                        "What is Science?", "Cell - The Basic Unit of Life", "Microbial World", 
+                        "Reproduction in Animals", "Adolescence", "Biodiversity and its Conservation", 
+                        "Different Ecosystems", "Food Production from Plants", 
+                        "Food Production from Animals", "Why do we fall ill?", 
+                        "Not to Drink - Not to Breath"
+                    ]
+                },
+                "SOCIAL": {
+                    "filename": "8EM_SOC.pdf",
+                    "chapters": [
+                        "Reading and Analysis of Maps", "Energy from the Sun", "Earth Movements and Seasons", 
+                        "The Polar Regions", "Forests: Using and Protecting Them", "Minerals and Mining", 
+                        "Money and Banking", "Impact of Technology on Livelihoods", 
+                        "Public Health and the Government", "Landlords and Tenants under the British and the Nizam", 
+                        "National Movement - The Early Phase", "National Movement - The Last Phase", 
+                        "Freedom Movement in Hyderabad State", "The Indian Constitution", 
+                        "Parliament and Central Government", "Law and Justice - A Case Study", 
+                        "Abolition of Zamindari System", "Understanding Poverty", "Rights Approach to Development", 
+                        "Social and Religious Reform Movements", "Understanding Secularism", 
+                        "Performing Arts and Artistes in Modern Times", "Film and Print Media", 
+                        "Sports: Nationalism and Commerce", "Disaster Management"
+                    ]
+                },
+                "ENGLISH": {
+                    "filename": "8_ENG.pdf",
+                    "chapters": [
+                        "The Tattered Blanket", "Oliver Asks for More", "The Selfish Giant", 
+                        "The Fun They Had", "Bonsai Life", "Gratitude"
+                    ]
+                }
+            }
+        },
+        "9": {
+            "ENG": {
+                "BIOLOGY": {
+                    "filename": "ENG/9_BIOLOGY_MERGED.pdf",
+                    "chapters": [
+                        "Cell its structure and functions", "Plant tissues", "Animal tissues", 
+                        "Plasma membrane", "Diversity in Living Organisms", "Sense Organs", 
+                        "Animal behaviour", "Challenges in Improving Agricultural Products", 
+                        "Adaptations in Different Ecosystems", "Soil pollution", "Biogeochemical cycles"
+                    ]
+                },
+                "PHYSICS": {
+                    "filename": "ENG/9_PHYSICS_MERGED.pdf",
+                    "chapters": [
+                        "Matter Around Us", "Motion", "Laws of Motion", "Refraction of Light at Plane Surfaces", 
+                        "Gravitation", "Is Matter Pure?", "Atoms and Molecules and Chemical Reactions", 
+                        "Floating Bodies", "What is inside the Atom?", "Work and Energy", "Heat", "Sound"
+                    ]
+                }
+            }
+        },
+        "10": {
+            "ENG": {
+                "ENVIRONMENTAL EDUCATION": {
+                    "filename": "10 env edn em 2021.pdf",
+                    "chapters": [
+                        "Global warming", "Saviours of our environment", "Estimation of particulate pollutants in air", 
+                        "Vaccination - A shield", "Mosquitoes - woes", "Fossil fuels", 
+                        "Changes in surroundings and their effect", "Use solar energy - Save electricity", 
+                        "Pollination - an interaction of plants and insects", "Observing 4 'R's", 
+                        "Conserving natural resources", "Over use of groundwater - it's consequences", 
+                        "Impact of low-cost materials on environment", "Urbanization - employment opportunities", 
+                        "Plenty of water - still we are thirsty!", "Do we need zoos?", 
+                        "Nature, culture, people and their relationships", "Household Wastes", 
+                        "The plight of ragpickers", "Water bodies in the neighbourhood", 
+                        "Impact assessment of developmental projects", "Awareness about common ailments", 
+                        "Disaster management", "Education for all - Everybody's concern", 
+                        "Let's keep our domestic environment healthy", "Depletion of natural resources", 
+                        "Conservation of water resources", "Flourosis", "Nature is a sacred place"
+                    ]
+                },
+                "SOCIAL": {
+                    "filename": "10 social em-21.pdf",
+                    "chapters": [
+                        "India: Relief Features", "Ideas of Development", "Production and Employment", 
+                        "Climate of India", "Indian Rivers and Water Resources", "The Population", 
+                        "Settlements - Migrations", "Rampur: A Village Economy", "Globalisation", 
+                        "Food Security", "Sustainable Development with Equity", 
+                        "World Between the World Wars", "National Liberation Movements in the Colonies", 
+                        "National Movement in India - Partition & Independence", 
+                        "The Making of Independent India's Constitution", "Election Process in India", 
+                        "Independent India (The First 30 years)", "Emerging Political Trends", 
+                        "Post - War World and India", "Social Movements in Our Times", 
+                        "The Movement for the Formation of Telangana State"
+                    ]
+                }
+            }
+        }
+    }
+}
+
+def get_available_books():
+    """
+    Scans the CONTENT/BOOKS directory and returns a nested dictionary structure:
+    Board -> Grade -> Language -> Subject -> [Chapters]
+    Uses BOOK_MAPPINGS if available, otherwise falls back to directory scanning.
+    """
+    base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CONTENT", "BOOKS")
+    structure = {}
+
+    if not os.path.exists(base_dir):
+        return structure
+
+    for board in os.listdir(base_dir):
+        board_path = os.path.join(base_dir, board)
+        if not os.path.isdir(board_path):
+            continue
+        
+        structure[board] = {}
+        
+        for grade in os.listdir(board_path):
+            grade_path = os.path.join(board_path, grade)
+            if not os.path.isdir(grade_path):
+                continue
+            
+            # Check if we have a mapping for this Board/Grade
+            if board in BOOK_MAPPINGS and grade in BOOK_MAPPINGS[board]:
+                structure[board][grade] = {}
+                mapped_grade = BOOK_MAPPINGS[board][grade]
+                
+                for lang, subjects in mapped_grade.items():
+                    structure[board][grade][lang] = {}
+                    for subj, details in subjects.items():
+                        # Verify file exists before adding
+                        # The file is expected to be directly in the grade folder for TSBIE/6
+                        # or in a subfolder? The user said "CONTENT/BOOKS/TSBIE/6/filename.pdf"
+                        # So we check os.path.join(grade_path, details['filename'])
+                        
+                        file_path = os.path.join(grade_path, details['filename'])
+                        if os.path.exists(file_path):
+                            structure[board][grade][lang][subj] = details['chapters']
+            else:
+                # Fallback to directory scanning
+                structure[board][grade] = {}
+                for item in os.listdir(grade_path):
+                    item_path = os.path.join(grade_path, item)
+                    
+                    if os.path.isdir(item_path):
+                        lang = item
+                        structure[board][grade][lang] = {}
+                        
+                        for subject in os.listdir(item_path):
+                            subject_path = os.path.join(item_path, subject)
+                            if os.path.isdir(subject_path):
+                                chapters = [f for f in os.listdir(subject_path) if f.lower().endswith('.pdf')]
+                                structure[board][grade][lang][subject] = chapters
+    
+    return structure
+
 def check_online_paper(generated_paper_filepath: str, submitted_answer_sheet_filepath: str, exam_name: str):
     """
     Compares the submitted answers with the generated paper and prints the result for each question.

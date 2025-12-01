@@ -1,105 +1,113 @@
-# ExamCraft
+# Smart Exam & Classroom Management System
 
-A Flask-based interface for generating and taking exams, with both online and offline modes.
+## Overview
+
+The **Smart Exam & Classroom Management System** is a comprehensive web application designed to revolutionize how exams are generated, taken, and graded. Leveraging the power of **Google Gemini AI**, it allows teachers to create custom exams for various needs (School, Competitive) and provides an intelligent grading system for handwritten answers. Additionally, it features a robust classroom management system for seamless interaction between teachers and students.
 
 ## Features
 
-- **Online Exam Mode**: Take exams directly in the browser with instant scoring
-- **Offline Exam Mode**: Download exam papers and upload answers later
-- **AI-Powered Answer Evaluation**: Uses Google Gemini to evaluate uploaded answer sheets
-- **Multiple Exam Types**: Supports JEE Mains, JEE Advanced, and NEET UG exams
-- **Customizable Difficulty**: Choose from easy, medium, or hard difficulty levels
-- **Various Question Formats**: Supports MCQ, subjective, and mixed format exams
+### 🧠 AI-Powered Exam Generation
+
+* **Customizable Exams**: Generate exams based on Subject, Grade, Board, Chapter, and Language.
+* **Competitive Exams**: Create practice papers for competitive exams like JEE, NEET, etc., with adjustable difficulty levels.
+* **Dual Modes**:
+  * **Online Mode**: Take interactive quizzes directly on the platform.
+  * **Offline Mode**: Download professionally formatted PDF question papers.
+
+### 📝 AI Grading & Analytics
+
+* **Handwritten Answer Grading**: Upload photos or PDFs of handwritten answer sheets.
+* **Intelligent Evaluation**: Gemini AI analyzes the answers, compares them with the key, and provides a score along with detailed explanations.
+* **Instant Feedback**: Get immediate results and performance insights.
+
+### 🏫 Classroom Management
+
+* **Role-Based Portals**: Dedicated dashboards for **Teachers** and **Students**.
+* **Class Creation**: Teachers can create classrooms and invite students via unique codes.
+* **Assignments**: Create, schedule, and track assignments.
+* **Discussion**: Integrated posting and commenting system for class discussions.
+
+### 🔔 Real-time Updates
+
+* **Notifications**: Stay informed about new assignments, grades, and class updates.
+
+## Tech Stack
+
+* **Backend**: Python (Flask)
+* **Database**: SQLite (SQLAlchemy)
+* **AI Engine**: Google Gemini API (`google-genai`)
+* **Frontend**: HTML, CSS, JavaScript (Jinja2 templates)
+* **PDF Handling**: `fpdf2`, `PyPDF2`
+
+## Prerequisites
+
+* Python 3.8 or higher
+* A Google Gemini API Key
 
 ## Installation
 
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   cd ExamCraft
-   ```
+1. **Clone the Repository**
 
-2. Create a virtual environment and activate it:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+    ```bash
+    git clone <repository-url>
+    cd quizproject
+    ```
 
-3. Install the required dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+2. **Create a Virtual Environment (Recommended)**
 
-4. Make sure you have a valid Google API key for Gemini in the `apikey.txt` file at the project root.
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    ```
+
+3. **Install Dependencies**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Set Up Environment Variables**
+    * Create a `.env` file in the root directory.
+    * Add your Gemini API Key:
+
+        ```env
+        GEMINI_API_KEY=your_api_key_here
+        ```
+
+    * Alternatively, you can place your key in a file named `apikey.txt` in the root directory.
 
 ## Usage
 
-1. Start the Flask application:
-   ```
-   python app.py
-   ```
+1. **Run the Application**
 
-2. Open your web browser and navigate to:
-   ```
-   http://127.0.0.1:5000/
-   ```
+    ```bash
+    python app.py
+    ```
 
-3. Choose between online and offline exam modes:
-   - **Online Mode**: Take the exam in the browser and get instant results
-   - **Offline Mode**: Download the exam paper and upload your answers later
+2. **Access the Web Interface**
+    * Open your browser and navigate to `http://127.0.0.1:5000`.
 
-## Online Exam Flow
-
-1. Select "Online Exam" on the home page
-2. Configure your exam:
-   - Choose an exam type (JEE Mains, JEE Advanced, NEET UG)
-   - Select difficulty level (easy, medium, hard)
-   - Choose exam format (MCQ, subjective, mixed)
-3. Click "Generate Exam" to create your exam
-4. Answer the questions in the browser
-5. Click "Submit Exam" when finished
-6. View your results and feedback
-
-## Offline Exam Flow
-
-1. Select "Offline Exam" on the home page
-2. Configure your exam (same options as online mode)
-3. Click "Generate Exam" to create your exam
-4. Download the exam paper using the provided button
-5. Complete the exam on your own time
-6. Return to the application and click "Upload Answers"
-7. Upload a photo or scan of your completed answer sheet
-8. View your results and feedback
-
-## API Key Setup
-
-The application requires a Google API key for Gemini to function properly:
-
-1. Obtain an API key from the [Google AI Studio](https://makersuite.google.com/)
-2. Create a file named `apikey.txt` in the project root directory
-3. Paste your API key into this file (no additional text or whitespace)
+3. **Getting Started**
+    * **Sign Up**: Create an account as a 'Teacher' or 'Student'.
+    * **Teacher**: Create a classroom, generate an exam, or post an assignment.
+    * **Student**: Join a classroom using a code, take an online quiz, or download a practice paper.
 
 ## Project Structure
 
-- `app.py`: Main Flask application
-- `src/generate_paper.py`: Core functionality for generating exam papers
-- `templates/`: HTML templates for the web interface
-- `static/`: CSS and JavaScript files
-- `GENERATED_PAPERS/`: Directory where generated exam papers are stored
-
-## Dependencies
-
-- Flask: Web framework
-- Google Genai: AI functionality for paper generation and answer evaluation
-- Pydantic: Data validation
-- Bootstrap: Frontend styling (loaded via CDN)
+```
+quizproject/
+├── app.py                 # Main Flask application entry point
+├── requirements.txt       # Python dependencies
+├── src/                   # Source code for core logic
+│   ├── generate_paper.py  # AI exam generation logic
+│   ├── utils.py           # Helper functions
+│   └── ...
+├── templates/             # HTML templates for the frontend
+├── static/                # Static assets (CSS, JS, Images)
+├── instance/              # SQLite database storage
+└── ...
+```
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Google Gemini for AI capabilities
-- Flask team for the excellent web framework
-- Bootstrap team for the frontend components
+[MIT License](LICENSE)

@@ -91,7 +91,25 @@ It should have a total of 200 questions, with 50 questions from each subject (Ph
         - MCQs (with four options, one correct)
 '''
 
-api_key = os.getenv("GEMINI_API_KEY")
+def get_api_key():
+    key = os.getenv("GEMINI_API_KEY")
+    if key:
+        return key.strip()
+    # Try reading from apikey.txt in the project root
+    try:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        key_path = os.path.join(base_dir, 'apikey.txt')
+        with open(key_path, 'r') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+
+api_key = get_api_key()
+
+if not api_key:
+    # Fallback or raise a clearer error if you prefer, 
+    # but the client init will raise if None is passed.
+    print("WARNING: GEMINI_API_KEY not found in env or apikey.txt")
 
 client = genai.Client(api_key=api_key)
 print("API KEY LOADED")
@@ -193,28 +211,64 @@ def generate_paper(name_of_the_exam: str, difficulty_level: Optional[str] = None
         Give your questions based on the activity sections of the chapter
         generate about 20 questions.'''
 
-        if subject.upper() in SUBJECTS and grade in GRADE and board.upper() in BOARD and language.upper() in LANGUAGE:
-            content = [prompt,
-                       f"You are generating a school quiz for {subject.upper()} grade {grade} board {board.upper()}"]
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
-            for chapter in chapters:
-                pdf_path = os.path.join(context_dir, chapter)
-                print(f"Resolved PDF path: {pdf_path}")
-                if os.path.exists(pdf_path):
-                    chapter_file = pathlib.Path(pdf_path)
-                    uploaded_file = client.files.upload(file=chapter_file)
-                    content.append(uploaded_file)
-                else:
-                    print(f"File not found: {pdf_path}")
-            response = client.models.generate_content(
-                    model=model,
-                    contents= content,
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": list[SchoolQuizFormat],
-                    },
-                )
+        content = [prompt,
+                   f"You are generating a school quiz for {subject} grade {grade} board {board}"]
+        
+        # Check if this is a mapped book
+        from src.utils import BOOK_MAPPINGS
+        mapped_book = None
+        if board in BOOK_MAPPINGS and str(grade) in BOOK_MAPPINGS[board]:
+             # Ensure language is provided, default to 'ENG'
+            lang_key = language if language else 'ENG'
+            if lang_key in BOOK_MAPPINGS[board][str(grade)]:
+                if subject in BOOK_MAPPINGS[board][str(grade)][lang_key]:
+                    mapped_book = BOOK_MAPPINGS[board][str(grade)][lang_key][subject]
+
+        if mapped_book:
+            # It's a mapped book (single PDF)
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CONTENT", "BOOKS")
+            pdf_path = os.path.join(base_dir, board, str(grade), mapped_book['filename'])
+            print(f"Using mapped book: {pdf_path}")
+            
+            if os.path.exists(pdf_path):
+                chapter_file = pathlib.Path(pdf_path)
+                uploaded_file = client.files.upload(file=chapter_file)
+                content.append(uploaded_file)
+                # Add specific instruction to focus on selected chapters
+                content.append(f"Focus strictly on the following chapters: {', '.join(chapters)}")
+            else:
+                print(f"Mapped file not found: {pdf_path}")
+        else:
+            # Legacy/Folder structure logic
+            # Construct path: CONTENT/BOOKS/Board/Grade/Language/Subject
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CONTENT", "BOOKS")
+            lang_dir = language if language else 'ENG'
+            context_dir = os.path.join(base_dir, board, str(grade), lang_dir, subject)
+            
+            print(f"Looking for context in: {context_dir}")
+            
+            if os.path.exists(context_dir):
+                for chapter in chapters:
+                    pdf_path = os.path.join(context_dir, chapter)
+                    print(f"Resolved PDF path: {pdf_path}")
+                    if os.path.exists(pdf_path):
+                        chapter_file = pathlib.Path(pdf_path)
+                        uploaded_file = client.files.upload(file=chapter_file)
+                        content.append(uploaded_file)
+                    else:
+                        print(f"File not found: {pdf_path}")
+            else:
+                print(f"Context directory not found: {context_dir}")
+
+        response = client.models.generate_content(
+                model=model,
+                contents= content,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": list[SchoolQuizFormat],
+                },
+            )
+            
     elif exam_upper == "SCHOOL_TEST":
         prompt = '''
         You are an intelligent AI whose main job is to generate test for school students,
@@ -226,28 +280,60 @@ def generate_paper(name_of_the_exam: str, difficulty_level: Optional[str] = None
         Give your questions based on the exercise sections of the chapter
         generate about 10 questions.'''
 
-        if subject.upper() in SUBJECTS and grade in GRADE and board.upper() in BOARD and language.upper() in LANGUAGE:
-            content = [prompt,
-                       f"You are generating a school test for {subject.upper()} grade {grade} board {board.upper()}"]
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            context_dir = os.path.join(base_dir, "..", "CONTENT", "BOOKS", board, grade, language, subject)
-            for chapter in chapters:
-                pdf_path = os.path.join(context_dir, chapter)
-                print(f"Resolved PDF path: {pdf_path}")
-                if os.path.exists(pdf_path):
-                    chapter_file = pathlib.Path(pdf_path)
-                    uploaded_file = client.files.upload(file=chapter_file)
-                    content.append(uploaded_file)
-                else:
-                    print(f"File not found: {pdf_path}")
-            response = client.models.generate_content(
-                    model=model,
-                    contents= content,
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": list[SchoolTestFormat],
-                    },
-                )
+        content = [prompt,
+                   f"You are generating a school test for {subject} grade {grade} board {board}"]
+        
+        # Check if this is a mapped book
+        from src.utils import BOOK_MAPPINGS
+        mapped_book = None
+        if board in BOOK_MAPPINGS and str(grade) in BOOK_MAPPINGS[board]:
+            lang_key = language if language else 'ENG'
+            if lang_key in BOOK_MAPPINGS[board][str(grade)]:
+                if subject in BOOK_MAPPINGS[board][str(grade)][lang_key]:
+                    mapped_book = BOOK_MAPPINGS[board][str(grade)][lang_key][subject]
+
+        if mapped_book:
+            # It's a mapped book (single PDF)
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CONTENT", "BOOKS")
+            pdf_path = os.path.join(base_dir, board, str(grade), mapped_book['filename'])
+            print(f"Using mapped book: {pdf_path}")
+            
+            if os.path.exists(pdf_path):
+                chapter_file = pathlib.Path(pdf_path)
+                uploaded_file = client.files.upload(file=chapter_file)
+                content.append(uploaded_file)
+                content.append(f"Focus strictly on the following chapters: {', '.join(chapters)}")
+            else:
+                print(f"Mapped file not found: {pdf_path}")
+        else:
+            # Legacy/Folder structure logic
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CONTENT", "BOOKS")
+            lang_dir = language if language else 'ENG'
+            context_dir = os.path.join(base_dir, board, str(grade), lang_dir, subject)
+            
+            print(f"Looking for context in: {context_dir}")
+
+            if os.path.exists(context_dir):
+                for chapter in chapters:
+                    pdf_path = os.path.join(context_dir, chapter)
+                    print(f"Resolved PDF path: {pdf_path}")
+                    if os.path.exists(pdf_path):
+                        chapter_file = pathlib.Path(pdf_path)
+                        uploaded_file = client.files.upload(file=chapter_file)
+                        content.append(uploaded_file)
+                    else:
+                        print(f"File not found: {pdf_path}")
+            else:
+                print(f"Context directory not found: {context_dir}")
+
+        response = client.models.generate_content(
+                model=model,
+                contents= content,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": list[SchoolTestFormat],
+                },
+            )
 
     if response is None:
         print(f"Could not generate paper for exam type: {name_of_the_exam}. Check parameters.")
