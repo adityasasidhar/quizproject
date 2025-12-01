@@ -14,6 +14,18 @@ from dotenv import load_dotenv
 from google import genai
 from src.generate_paper import generate_paper
 from src.utils import *
+from pydantic import BaseModel
+from typing import List
+
+class GradingResult(BaseModel):
+    question_number: int
+    extracted_answer: str
+    correct_answer: str
+    is_correct: bool
+    explanation: str
+
+class GradingResponse(BaseModel):
+    results: List[GradingResult]
 
 load_dotenv() # Load environment variables from .env file
 
@@ -448,20 +460,20 @@ def upload_answers():
                     }
                     contents.append(image_parts)
                 
-                # Use a capable model
+                # Use a capable model with structured output
                 response = client.models.generate_content(
-                    model="gemini-1.5-flash",
+                    model="gemini-2.0-flash",
                     contents=contents,
+                    config={
+                        'response_mime_type': 'application/json',
+                        'response_schema': GradingResponse
+                    }
                 )
 
                 try:
-                    response_text = response.text
-                    if "```json" in response_text:
-                        json_content = response_text.split("```json")[1].split("```")[0].strip()
-                    else:
-                        json_content = response_text
-                    
-                    results = json.loads(json_content)
+                    # Parse the response using Pydantic
+                    grading_response = response.parsed
+                    results = [result.model_dump() for result in grading_response.results]
                     
                     score = sum(1 for r in results if r.get('is_correct', False))
                     total = len(results)

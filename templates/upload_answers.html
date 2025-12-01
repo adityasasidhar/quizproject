@@ -5,17 +5,18 @@
 {% block head %}
 <style>
     .upload-area {
-        border: 2px dashed #ccc;
+        border: 2px dashed var(--border-color);
         border-radius: 8px;
         padding: 2rem;
         text-align: center;
         margin-bottom: 1.5rem;
         transition: all 0.3s;
+        background-color: var(--card-bg);
     }
 
     .upload-area:hover {
-        border-color: #0d6efd;
-        background-color: #f8f9fa;
+        border-color: var(--accent-color);
+        background-color: #2d2d2d;
     }
 
     .upload-icon {
@@ -38,7 +39,7 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header">
                 <h2 class="text-center mb-0">Upload Answers</h2>
             </div>
             <div class="card-body">

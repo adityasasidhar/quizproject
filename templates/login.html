@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ (role|capitalize if role else 'Member') }} Login - ExamCraft</title>
@@ -13,15 +14,17 @@
             height: 100vh;
             margin: 0;
         }
+
         .login-wrapper {
             display: flex;
             max-width: 900px;
             width: 100%;
             background-color: white;
             border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
+
         .login-graphic {
             flex: 1;
             background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
@@ -30,41 +33,51 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 3rem;
+            padding: 5rem;
+            /* Increased padding */
             text-align: center;
         }
+
         .login-graphic h2 {
             font-weight: 700;
             font-size: 2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            /* Increased margin */
         }
+
         .login-graphic p {
             font-size: 1.1rem;
             opacity: 0.9;
         }
+
         .login-form-container {
             flex: 1;
-            padding: 3rem;
+            padding: 5rem;
+            /* Increased padding */
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+
         .login-form-container h2 {
             font-weight: 700;
             color: #333;
             margin-bottom: 2rem;
             text-align: center;
         }
+
         .form-control {
             border-radius: 12px;
             padding: 0.85rem 1.25rem;
             border: 1px solid #ced4da;
             transition: all 0.3s ease;
         }
+
         .form-control:focus {
             border-color: #5a78f0;
             box-shadow: 0 0 0 0.25rem rgba(90, 120, 240, 0.25);
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
             border: none;
@@ -74,24 +87,29 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(90, 120, 240, 0.3);
         }
+
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(90, 120, 240, 0.5);
         }
+
         .signup-link {
             text-align: center;
             margin-top: 1.5rem;
         }
+
         .signup-link a {
             color: #5a78f0;
             font-weight: 600;
             text-decoration: none;
         }
+
         .alert {
             border-radius: 12px;
         }
     </style>
 </head>
+
 <body>
     <div class="login-wrapper">
         <div class="login-graphic">
@@ -101,17 +119,17 @@
         <div class="login-form-container">
             <h2>{{ (role|capitalize if role else 'Member') }} Login</h2>
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
             {% if error %}
-                <div class="alert alert-danger">{{ error }}</div>
+            <div class="alert alert-danger">{{ error }}</div>
             {% endif %}
             <form method="post">
                 <div class="mb-3">
@@ -133,4 +151,5 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- MathJax -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     {% block head %}{% endblock %}
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -40,15 +61,19 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="{{ url_for('notifications_page') }}" title="Notifications">
+                        <a class="nav-link position-relative" href="{{ url_for('notifications_page') }}"
+                            title="Notifications">
                             <i class="fas fa-bell"></i>
                             {% if unread_notifications and unread_notifications > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications }}</span>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{
+                                unread_notifications }}</span>
                             {% endif %}
                         </a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.username }}{% if session.role %} - {{ session.role|capitalize }}{% endif %})</a>
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout ({{ session.username }}{% if
+                            session.role %} - {{ session.role|capitalize }}{% endif %})</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -69,24 +94,20 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container py-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="mt-5 py-3 bg-light text-center">
-        <div class="container">
-            <p class="mb-0">ExamCraft &copy; 2025</p>
-        </div>
-    </footer>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -94,4 +115,5 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

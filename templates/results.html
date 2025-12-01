@@ -5,56 +5,74 @@
 {% block head %}
 <style>
     body {
-        background-color: #f0f4f8;
+        background-color: var(--bg-color);
     }
+
     .result-card {
         margin-bottom: 1.5rem;
         border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border: 1px solid #e0e6ed;
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+        background-color: var(--card-bg);
     }
+
     .result-card.correct {
-        border-left: 5px solid #28a745;
+        border-left: 5px solid #22c55e;
+        /* Green-500 */
     }
+
     .result-card.incorrect {
-        border-left: 5px solid #dc3545;
+        border-left: 5px solid #ef4444;
+        /* Red-500 */
     }
+
     .question-number {
         font-weight: bold;
         margin-right: 0.5rem;
-        color: #007bff;
+        color: var(--accent-color);
     }
+
     .correct-answer-text {
-        color: #28a745;
+        color: #22c55e;
         font-weight: bold;
     }
+
     .incorrect-answer-text {
-        color: #dc3545;
+        color: #ef4444;
         font-weight: bold;
     }
+
     .score-summary-card {
-        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
-        color: white;
+        background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
         border-radius: 20px;
         padding: 2.5rem;
         margin-bottom: 2.5rem;
     }
+
     .score-percentage {
         font-size: 4rem;
         font-weight: 700;
+        color: var(--accent-color);
     }
+
     .score-details {
         font-size: 1.3rem;
+        color: var(--text-secondary);
     }
+
     .solution {
-        background-color: #e9f5ff;
-        border-left: 4px solid #007bff;
+        background-color: #2d2d2d;
+        border-left: 4px solid var(--accent-color);
         padding: 1rem;
         margin-top: 1rem;
         border-radius: 8px;
+        color: var(--text-secondary);
     }
+
     .btn-primary.rounded-pill {
-        background: linear-gradient(135deg, #5a78f0 0%, #3a55b4 100%);
+        background-color: var(--accent-color);
         border: none;
         padding: 0.85rem 2rem;
         font-weight: 700;
@@ -70,27 +88,27 @@
                 <h2 class="mb-3">Your Exam Result</h2>
                 <div class="score-percentage">{{ percentage|round(1) }}%</div>
                 <div class="score-details">
-                    You answered <span class="badge bg-light text-dark">{{ score }}</span> correctly out of 
-                    <span class="badge bg-light text-dark">{{ total }}</span> questions.
+                    You answered <span class="badge bg-secondary text-white">{{ score }}</span> correctly out of
+                    <span class="badge bg-secondary text-white">{{ total }}</span> questions.
                 </div>
                 <div class="mt-4">
                     {% if percentage >= 90 %}
-                        <p class="lead"><strong>Excellent!</strong> You've demonstrated exceptional understanding.</p>
+                    <p class="lead"><strong>Excellent!</strong> You've demonstrated exceptional understanding.</p>
                     {% elif percentage >= 75 %}
-                        <p class="lead"><strong>Great job!</strong> You have a strong grasp of the material.</p>
+                    <p class="lead"><strong>Great job!</strong> You have a strong grasp of the material.</p>
                     {% elif percentage >= 60 %}
-                        <p class="lead"><strong>Good effort!</strong> There's room for improvement.</p>
+                    <p class="lead"><strong>Good effort!</strong> There's room for improvement.</p>
                     {% else %}
-                        <p class="lead"><strong>Keep studying!</strong> Review the material to improve your score.</p>
+                    <p class="lead"><strong>Keep studying!</strong> Review the material to improve your score.</p>
                     {% endif %}
                 </div>
             </div>
 
             <h3 class="mb-4">Detailed Results</h3>
-            
+
             {% for result in results %}
             <div class="card result-card {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
-                <div class="card-header bg-light">
+                <div class="card-header">
                     <span class="question-number">Question {{ result.question_number }}:</span>
                     {{ result.question | safe }}
                 </div>
@@ -98,20 +116,21 @@
                     <div class="row align-items-center">
                         <div class="col-md-6">
                             <p class="mb-2">
-                                <strong>Your Answer:</strong> 
-                                <span class="{% if result.is_correct %}correct-answer-text{% else %}incorrect-answer-text{% endif %}">
+                                <strong>Your Answer:</strong>
+                                <span
+                                    class="{% if result.is_correct %}correct-answer-text{% else %}incorrect-answer-text{% endif %}">
                                     {{ result.user_answer if result.user_answer else 'No answer provided' }}
                                 </span>
                             </p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-0">
-                                <strong>Correct Answer:</strong> 
+                                <strong>Correct Answer:</strong>
                                 <span class="correct-answer-text">{{ result.correct_answer }}</span>
                             </p>
                         </div>
                     </div>
-                    
+
                     {% if not result.is_correct and result.solution %}
                     <div class="solution mt-3">
                         <strong>Solution:</strong>
@@ -127,7 +146,8 @@
                 {% if is_uploaded is defined and is_uploaded %}
                 <a href="{{ url_for('upload_answers') }}" class="btn btn-secondary rounded-pill">Upload Another</a>
                 {% else %}
-                <a href="{{ url_for('exam_selection', exam_type=session.get('exam_name')) }}" class="btn btn-secondary rounded-pill">Take Another Exam</a>
+                <a href="{{ url_for('exam_selection', exam_type=session.get('exam_name')) }}"
+                    class="btn btn-secondary rounded-pill">Take Another Exam</a>
                 {% endif %}
             </div>
         </div>

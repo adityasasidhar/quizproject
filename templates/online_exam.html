@@ -8,31 +8,41 @@
         display: none;
         margin-bottom: 1.5rem;
         border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        min-height: 450px; /* Increased height */
+        box-shadow: none;
+        border: 1px solid var(--border-color);
+        min-height: 450px;
+        background-color: var(--card-bg);
     }
+
     .question-card.active {
         display: block;
     }
+
     .question-card .card-body {
-        font-size: 1.15rem; /* Increased font size */
+        font-size: 1.15rem;
     }
+
     .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #007bff;
-        font-size: 1.3rem; /* Increased font size */
+        background-color: transparent;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 1.3rem;
+        color: var(--text-primary);
     }
+
     .timer {
         font-size: 1.5rem;
         font-weight: bold;
-        color: #dc3545;
+        color: #ef4444;
+        /* Red for dark mode */
     }
+
     .question-palette {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-top: 1rem;
     }
+
     .palette-item {
         width: 35px;
         height: 35px;
@@ -44,27 +54,34 @@
         cursor: pointer;
         transition: all 0.2s ease;
     }
+
     .palette-item.unvisited {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
     }
+
     .palette-item.visited {
-        background-color: #e9ecef;
-        color: #333;
+        background-color: #555;
+        color: #fff;
     }
+
     .palette-item.current {
-        background-color: #007bff;
+        background-color: var(--accent-color);
         color: white;
         transform: scale(1.1);
+        border: none;
     }
+
     .navigation-buttons {
         display: flex;
         justify-content: space-between;
         margin-top: 2rem;
     }
+
     .action-buttons {
         display: flex;
-        justify-content: flex-start; /* Aligns buttons to the left */
+        justify-content: flex-start;
         gap: 1rem;
         margin-top: 1.5rem;
     }
@@ -80,7 +97,7 @@
 <div class="row">
     <div class="col-md-10">
         <div class="card mb-4">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">Exam Questions</h2>
                 <div class="d-flex flex-column align-items-end">
                     <div class="timer" id="exam-timer">03:00:00</div>
@@ -91,7 +108,8 @@
                 <div id="progress-indicator" class="text-center font-weight-bold mb-3"></div>
                 <form method="POST" action="{{ url_for('submit_exam') }}" id="exam-form">
                     {% for question in questions %}
-                    <div class="card question-card {% if loop.first %}active{% endif %}" id="question-{{ loop.index0 }}">
+                    <div class="card question-card {% if loop.first %}active{% endif %}"
+                        id="question-{{ loop.index0 }}">
                         <div class="card-header">
                             <span class="question-number">Question {{ question.question_number }}:</span>
                             {{ question.question | safe }}
@@ -102,8 +120,12 @@
                                 {% for option in question.options %}
                                 <li>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="{{ question.question_number }}" id="q{{ question.question_number }}_option{{ loop.index }}" value="{{ option }}">
-                                        <label class="form-check-label" for="q{{ question.question_number }}_option{{ loop.index }}">
+                                        <input class="form-check-input" type="radio"
+                                            name="{{ question.question_number }}"
+                                            id="q{{ question.question_number }}_option{{ loop.index }}"
+                                            value="{{ option }}">
+                                        <label class="form-check-label"
+                                            for="q{{ question.question_number }}_option{{ loop.index }}">
                                             {{ option | safe }}
                                         </label>
                                     </div>
@@ -112,8 +134,10 @@
                             </ul>
                             {% else %}
                             <div class="mb-3">
-                                <label for="q{{ question.question_number }}_answer" class="form-label">Your Answer:</label>
-                                <input type="text" class="form-control" id="q{{ question.question_number }}_answer" name="{{ question.question_number }}" placeholder="Enter your answer">
+                                <label for="q{{ question.question_number }}_answer" class="form-label">Your
+                                    Answer:</label>
+                                <input type="text" class="form-control" id="q{{ question.question_number }}_answer"
+                                    name="{{ question.question_number }}" placeholder="Enter your answer">
                             </div>
                             {% endif %}
                         </div>
@@ -126,7 +150,8 @@
                     </div>
 
                     <div class="action-buttons mt-4">
-                        <button type="submit" id="submit-btn" class="btn btn-success btn-lg rounded-pill">Submit</button>
+                        <button type="submit" id="submit-btn"
+                            class="btn btn-success btn-lg rounded-pill">Submit</button>
                         <a href="{{ url_for('index') }}" class="btn btn-danger btn-sm rounded-pill">Cancel</a>
                     </div>
                 </form>
@@ -151,14 +176,14 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const questions = document.querySelectorAll('.question-card');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const submitBtn = document.getElementById('submit-btn');
         const progressIndicator = document.getElementById('progress-indicator');
         const paletteContainer = document.getElementById('question-palette');
-        
+
         let currentQuestion = 0;
         const visitedStatus = Array(questions.length).fill(false);
 
@@ -192,12 +217,12 @@
         function showQuestion(index) {
             visitedStatus[currentQuestion] = true;
             currentQuestion = index;
-            
+
             questions.forEach((q, i) => q.classList.toggle('active', i === index));
             progressIndicator.textContent = `Question ${index + 1} of ${questions.length}`;
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === questions.length - 1;
-            
+
             updatePalette();
         }
 
@@ -234,7 +259,7 @@
                 const minutes = Math.floor((remainingTime % 3600) / 60);
                 const seconds = remainingTime % 60;
 
-                timerElement.textContent = 
+                timerElement.textContent =
                     `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
                 if (remainingTime <= 0) {
@@ -249,7 +274,7 @@
         }
 
         // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             const activeEl = document.activeElement;
             const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
             if (e.key === 'ArrowRight') {

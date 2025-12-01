@@ -19,7 +19,8 @@
     <div class="card h-100">
       <div class="card-body text-center">
         <div class="text-muted">Average</div>
-        <div class="display-6">{% if avg is not none %}{{ '%.1f'|format(avg) }}%{% else %}<span class="text-muted">—</span>{% endif %}</div>
+        <div class="display-6">{% if avg is not none %}{{ '%.1f'|format(avg) }}%{% else %}<span
+            class="text-muted">—</span>{% endif %}</div>
       </div>
     </div>
   </div>
@@ -27,7 +28,8 @@
     <div class="card h-100">
       <div class="card-body text-center">
         <div class="text-muted">Best</div>
-        <div class="display-6">{% if best is not none %}{{ '%.1f'|format(best) }}%{% else %}<span class="text-muted">—</span>{% endif %}</div>
+        <div class="display-6">{% if best is not none %}{{ '%.1f'|format(best) }}%{% else %}<span
+            class="text-muted">—</span>{% endif %}</div>
       </div>
     </div>
   </div>
@@ -35,7 +37,8 @@
     <div class="card h-100">
       <div class="card-body text-center">
         <div class="text-muted">Worst</div>
-        <div class="display-6">{% if worst is not none %}{{ '%.1f'|format(worst) }}%{% else %}<span class="text-muted">—</span>{% endif %}</div>
+        <div class="display-6">{% if worst is not none %}{{ '%.1f'|format(worst) }}%{% else %}<span
+            class="text-muted">—</span>{% endif %}</div>
       </div>
     </div>
   </div>
@@ -82,41 +85,44 @@
             <td>{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
             <td>
               {% if s %}
-                <span class="badge bg-success">Submitted</span>
-                <div><small class="text-muted">{{ s.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small></div>
+              <span class="badge bg-success">Submitted</span>
+              <div><small class="text-muted">{{ s.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small></div>
               {% else %}
-                <span class="badge bg-secondary">Not Submitted</span>
+              <span class="badge bg-secondary">Not Submitted</span>
               {% endif %}
             </td>
             <td>
               {% if s %}
-                {{ s.score }}/{{ s.total }}
+              {{ s.score }}/{{ s.total }}
               {% else %}
-                <span class="text-muted">—</span>
+              <span class="text-muted">—</span>
               {% endif %}
             </td>
             <td>
               {% if s %}
-                {{ '%.1f'|format(s.percentage) }}%
+              {{ '%.1f'|format(s.percentage) }}%
               {% else %}
-                <span class="text-muted">—</span>
+              <span class="text-muted">—</span>
               {% endif %}
             </td>
             <td class="text-end">
               {% if s %}
-              <form class="row g-2 justify-content-end" method="post" action="{{ url_for('update_submission', submission_id=s.id) }}">
+              <form class="row g-2 justify-content-end" method="post"
+                action="{{ url_for('update_submission', submission_id=s.id) }}">
                 <div class="col-auto">
-                  <input type="number" class="form-control form-control-sm" name="score" value="{{ s.score }}" min="0" step="1" required>
+                  <input type="number" class="form-control form-control-sm" name="score" value="{{ s.score }}" min="0"
+                    step="1" required>
                 </div>
                 <div class="col-auto">
-                  <input type="number" class="form-control form-control-sm" name="total" value="{{ s.total }}" min="1" step="1" required>
+                  <input type="number" class="form-control form-control-sm" name="total" value="{{ s.total }}" min="1"
+                    step="1" required>
                 </div>
                 <div class="col-auto">
                   <button type="submit" class="btn btn-sm btn-primary">Save</button>
                 </div>
               </form>
               {% else %}
-                <span class="text-muted">—</span>
+              <span class="text-muted">—</span>
               {% endif %}
             </td>
           </tr>
@@ -125,7 +131,7 @@
       </table>
     </div>
     {% else %}
-      <div class="alert alert-info mb-0">No assignments defined yet.</div>
+    <div class="alert alert-info mb-0">No assignments defined yet.</div>
     {% endif %}
   </div>
 </div>
@@ -153,7 +159,25 @@
   };
   const opt = {
     scales: {
-      y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          callback: v => v + '%',
+          color: '#ffffff'
+        },
+        grid: {
+          color: '#333333'
+        }
+      },
+      x: {
+        ticks: {
+          color: '#ffffff'
+        },
+        grid: {
+          color: '#333333'
+        }
+      }
     },
     plugins: { legend: { display: false } }
   };
