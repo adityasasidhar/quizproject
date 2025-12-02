@@ -13,7 +13,7 @@ import httpx
 import pathlib
 from dotenv import load_dotenv
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()
 
 class SchoolQuizFormat(BaseModel):
     question_number : str
